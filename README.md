@@ -1,4 +1,4 @@
-# CME495 Capstone Project
+# <ins>CME495 Capstone Project</ins>
 
 _put the problem definition here reworded to describe to the user what it is and does and why_
 </br></br>
