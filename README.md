@@ -3,7 +3,7 @@
 _put the problem definition here reworded to describe to the user what it is and does and why_
 </br></br>
 
-## Group Members
+## <ins>Group Members</ins>
 * Michael Coquet
 * other member
 * other member
@@ -11,9 +11,9 @@ _put the problem definition here reworded to describe to the user what it is and
 * other member
 </br></br>
 
-## Usage Instructions
+## <ins>Usage Instructions</ins>
 _put usage instructions for user here_
 </br></br>
 
-## Design schematics and Diagrams
+## <ins>Design schematics and Diagrams</ins>
 _put the detailed design specs or links to wiki here_
