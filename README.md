@@ -4,11 +4,10 @@ _put the problem definition here reworded to describe to the user what it is and
 </br></br>
 
 ## <ins>Group Members</ins>
-* Michael Coquet
-* other member
-* other member
-* other member
-* other member
+* Michael Coquet 
+* Ryan Betker
+* Layne Forbes
+* Nnamdi Emezieke
 </br></br>
 
 ## <ins>Usage Instructions</ins>
