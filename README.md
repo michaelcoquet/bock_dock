@@ -15,4 +15,4 @@ _put usage instructions for user here_
 </br></br>
 
 ## <ins>Design schematics and Diagrams</ins>
-_put the detailed design specs or links to wiki here_
+See wiki page for detailed design docs `https://gitlab.com/m.coquet2/cme495_capstone/-/wikis/Home`
