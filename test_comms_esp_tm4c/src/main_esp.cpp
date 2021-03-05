@@ -18,22 +18,11 @@ String header;
 
 // Auxiliar variables to store the current output state
 String red_led_state = "off";
-String blue_led_state = "off";
 String green_led_state = "off";
-
-// Assign output variables to GPIO pins
-const int output5 = 5;
-const int output4 = 4;
+String blue_led_state = "off";
 
 void setup() {
   Serial.begin(115200);
-  
-  // Initialize the output variables as outputs
-  pinMode(output5, OUTPUT);
-  pinMode(output4, OUTPUT);
-  // Set outputs to LOW
-  digitalWrite(output5, LOW);
-  digitalWrite(output4, LOW);
 
   // WiFiManager
   // Local intialization. Once its business is done, there is no need to keep it around
@@ -49,7 +38,7 @@ void setup() {
   // if it does not connect it starts an access point with the specified name
   // here  "AutoConnectAP"
   // and goes into a blocking loop awaiting configuration
-  wifiManager.autoConnect("AutoConnectAP");
+  wifiManager.autoConnect("Kegerator Connect");
   // or use this for auto generated name ESP + ChipID
   //wifiManager.autoConnect();
   // if you get here you have connected to the WiFi
@@ -83,23 +72,23 @@ void loop(){
             client.println();
             
             // turns the GPIOs on and off
-            if (header.indexOf("GET /red/on") >= 0) {
-              Serial.println("red on");
+            if (header.indexOf("GET /0/1") >= 0) {
+              Serial.println("01");
               red_led_state = "on";
-            } else if (header.indexOf("GET /red/off") >= 0) {
-              Serial.println("red off");
+            } else if (header.indexOf("GET /0/0") >= 0) {
+              Serial.println("00");
               red_led_state = "off";
-            } else if (header.indexOf("GET /blue/on") >= 0) {
-              Serial.println("blue on");
+            } else if (header.indexOf("GET /2/1") >= 0) {
+              Serial.println("21");
               blue_led_state = "on";
-            } else if (header.indexOf("GET /blue/off") >= 0) {
-              Serial.println("blue off");
+            } else if (header.indexOf("GET /2/0") >= 0) {
+              Serial.println("20");
               blue_led_state = "off";
-            } else if (header.indexOf("GET /green/on") >= 0) {
-              Serial.println("green on");
+            } else if (header.indexOf("GET /1/1") >= 0) {
+              Serial.println("11");
               green_led_state = "on";
-            } else if (header.indexOf("GET /green/off") >= 0) {
-              Serial.println("green off");
+            } else if (header.indexOf("GET /1/0") >= 0) {
+              Serial.println("10");
               green_led_state = "off";
             }
             
@@ -121,27 +110,27 @@ void loop(){
             client.println("<p>Red LED - State " + red_led_state + "</p>");
             // If the red_led_state is off, it displays the ON button       
             if (red_led_state=="off") {
-              client.println("<p><a href=\"/red/on\"><button class=\"button\">ON</button></a></p>");
+              client.println("<p><a href=\"/0/1\"><button class=\"button\">ON</button></a></p>");
             } else {
-              client.println("<p><a href=\"/red/off\"><button class=\"button button2\">OFF</button></a></p>");
+              client.println("<p><a href=\"/0/0\"><button class=\"button button2\">OFF</button></a></p>");
             } 
                
             // Display current state, and ON/OFF buttons for Blue LED 
             client.println("<p>Blue LED - State " + blue_led_state + "</p>");
             // If the blue_led_state is off, it displays the ON button       
             if (blue_led_state=="off") {
-              client.println("<p><a href=\"/blue/on\"><button class=\"button\">ON</button></a></p>");
+              client.println("<p><a href=\"/2/1\"><button class=\"button\">ON</button></a></p>");
             } else {
-              client.println("<p><a href=\"/blue/off\"><button class=\"button button2\">OFF</button></a></p>");
+              client.println("<p><a href=\"/2/0\"><button class=\"button button2\">OFF</button></a></p>");
             }
 
             // Display current state, and ON/OFF buttons for Green LED
             client.println("<p>Green LED - State " + green_led_state + "</p>");
             // If the blue_led_state is off, it displays the ON button       
             if (green_led_state=="off") {
-              client.println("<p><a href=\"/green/on\"><button class=\"button\">ON</button></a></p>");
+              client.println("<p><a href=\"/1/1\"><button class=\"button\">ON</button></a></p>");
             } else {
-              client.println("<p><a href=\"/green/off\"><button class=\"button button2\">OFF</button></a></p>");
+              client.println("<p><a href=\"/1/0\"><button class=\"button button2\">OFF</button></a></p>");
             }
             client.println("</body></html>");
             
