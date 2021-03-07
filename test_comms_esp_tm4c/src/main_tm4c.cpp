@@ -1,10 +1,13 @@
 #include <Energia.h>
 
 void toggle_led(int led_id, char led_state);
+void decode_buttons();
 
 const int ledR = RED_LED;
 const int ledG = GREEN_LED;
 const int ledB = BLUE_LED;
+
+String uart_buf;
 
 void setup() {
   // initialize ports:
@@ -18,22 +21,30 @@ void setup() {
 }
 
 void loop() {
-  if(Serial2.available()) {
-    char led_id = (char)Serial2.read();
-    char led_state = (char)Serial2.read();
+  if(Serial2.available() > 0)
+  {
+    char recv = Serial2.read();
+    uart_buf += recv;
+    if(recv == '\n') {
+      decode_buttons();
+      uart_buf = "";
+    }
+  }
+}
 
-    if(led_id == '0')
-    {
-      toggle_led(ledR, led_state);
-    }
-    else if(led_id == '1')
-    {
-      toggle_led(ledG, led_state);
-    }
-    else if(led_id == '2')
-    {
-      toggle_led(ledB, led_state);
-    }
+void decode_buttons()
+{
+  if(uart_buf[0] == '0')
+  {
+    toggle_led(ledR, uart_buf[1]);
+  }
+  else if(uart_buf[0] == '1')
+  {
+    toggle_led(ledG, uart_buf[1]);
+  }
+  else if(uart_buf[0] == '2')
+  {
+    toggle_led(ledB, uart_buf[1]);
   }
 }
 
