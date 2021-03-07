@@ -29,7 +29,7 @@ String blue_led_state = "off";
 Scheduler runner;
 
 // declare tasks
-Task get_button_states(20, TASK_FOREVER, &check_buttons);
+Task get_button_states(5, TASK_FOREVER, &check_buttons);
 Task write_to_blynk_v0(15000, TASK_FOREVER, &write_v0);
 Task check_connection(1000, TASK_FOREVER, &conn_status);
 
