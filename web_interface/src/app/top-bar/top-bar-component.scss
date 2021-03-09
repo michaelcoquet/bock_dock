@@ -1,0 +1,25 @@
+@import '~@angular/material/theming';
+
+// Include non-theme styles for core.
+@include mat-core();
+
+.logo {
+    width: 10em;
+    height: auto;
+    margin-top: 20px;
+    border-left: 4px solid map-get($mat-deep-purple, 500);
+    border-right: 4px solid map_get($mat-deep-purple, 500);
+    border-radius: 40px;
+    background: map_get($mat-deep-purple, 500);
+}
+
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+
+/*
+Copyright Google LLC. All Rights Reserved.
+Use of this source code is governed by an MIT-style license that
+can be found in the LICENSE file at https://angular.io/license
+*/
