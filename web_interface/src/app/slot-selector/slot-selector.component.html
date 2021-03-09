@@ -1,0 +1,39 @@
+<h2>Keg Slots</h2>
+
+<div *ngFor="let slot of slots">
+    <div class="slot-grouping">
+        <a [title]="slot.brew_name + ' details'" [routerLink]="['/slot', slot.id]">
+            <button class="btn_slot" [ngClass]="{ 'btn_inactive': slot.active == false}">
+            </button>
+        </a>
+    </div>
+    <div *ngIf="slot.id == 4" style="clear:both"></div>
+</div>
+
+        <!-- <h3>
+    <a [title]="slot.brew_name + ' details'" [routerLink]="['/slot', slot.id]">
+        {{ slot.brew_name }}
+    </a>
+  </h3>
+
+  <p *ngIf="product.description">
+    Description: {{ product.description }}
+  </p>
+
+  <button (click)="share()">
+    Share
+  </button>
+  
+  <app-product-alerts
+    [product]="product" 
+    (notify)="onNotify()">
+  </app-product-alerts> -->
+
+
+
+
+<!-- 
+Copyright Google LLC. All Rights Reserved.
+Use of this source code is governed by an MIT-style license that
+can be found in the LICENSE file at https://angular.io/license
+-->
