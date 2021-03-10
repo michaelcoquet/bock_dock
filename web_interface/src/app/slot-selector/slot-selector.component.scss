@@ -1,11 +1,5 @@
 @import '~@angular/material/theming';
 
-.slot-select-dropdown{
-    margin-top: 15%;
-    text-align: center;
-    align-content: center;
-}
-
 .btn_slot {
     cursor: pointer;
     color: map-get($mat-amber, 400);
@@ -23,34 +17,17 @@
 }
 
 .header {
-  display: inline-flex;
+  text-align: center;
   margin-right: 3%;
+  margin-top: 15%;
   color: map-get($mat-amber, 400);
   font-size: 200%;
   text-shadow: -2px 0 map-get($mat-deep-purple, 500), 0 2px map-get($mat-deep-purple, 500), 2px 0 map-get($mat-deep-purple, 500), 0 -2px map-get($mat-deep-purple, 500);
 }
 
-.label {
-  color: map-get($mat-deep-purple, 500);
-  font-size: 100%;
-}
-
-.option {
-  color: map-get($mat-deep-purple, 500);
-  font-size: 100%;
-}
-
-::ng-deep .mat-select-value {    
-  color: map-get($mat-deep-purple, 500);  
-}
-
-::ng-deep .mat-select-panel {
-  background-color: map-get($mat-amber, 400);
-}
-
 .mat-divider {
-  margin-left: 10%;
-  margin-right: 10%;
+  margin: 10%;
+  margin-top: 0%;
   border-top-color: map-get($mat-deep-purple, 500);
 }
 
@@ -59,7 +36,7 @@
   grid-template-columns: 15% 15% 15% 15%;
   text-align: center;
   justify-content: center;
-  margin-bottom: 10%;
+  margin-bottom: 3%;
   margin-top: 3%;
 }
 

@@ -1,69 +1,20 @@
-<!-- <h2>Keg Slots</h2>
-
-<div class="keg-select-container">
-  <div *ngFor="let slot of slots">
-    <div class="slot-grouping">
-        <a [title]="slot.brew_name + ' details'" [routerLink]="['/slot', slot.id]">
-        <button class="btn_slot" [ngClass]="{ 'btn_inactive': slot.active == false}">
-        </button>
-        </a>
-    </div>
-    <div *ngIf="slot.id == 4" style="clear:both"></div>
-  </div>
-  <div class="slot-select-dropdown">
-        <app-name-dropdown></app-name-dropdown>
-  </div>
-</div> -->
-
-
-<div class="slot-select-dropdown">
-  <div class="header">
-    <h1><b>Keg Slots</b></h1>
-  </div>
-  <mat-form-field>
-    <mat-label class="label">Select a keg</mat-label>
-    <mat-select [formControl]="brewControl" required>
-      <mat-option *ngFor="let slot of slots" value="slot.brew_name" class="option">
-        <option *ngIf="slot.active == true; else empty">Slot {{slot.id}}: {{slot.brew_name}}</option>
-        <ng-template #empty>
-          Slot {{slot.id}}: ---------------
-        </ng-template>
-      </mat-option>
-    </mat-select>
-    <mat-error *ngIf="brewControl.hasError('required')">Please choose a keg</mat-error>
-    <mat-hint>{{brewControl.value?.sound}}</mat-hint>
-  </mat-form-field>
+<div class="header">
+  <h1><b>Keg Slots</b></h1>
 </div>
+
 <div class="example-container">
   <form [formGroup]="options">
     <div *ngFor="let slot of slots">
-        <a [title]="slot.brew_name + ' details'" [routerLink]="['/slot', slot.id]">
-          <button mat-mini-fab class="btn_slot" [ngClass]="{ 'btn_inactive': slot.active == false}">'</button>
+      <nav>
+        <a [title]="slot.brew_name + ' details'" [routerLink]="['/slot/', slot.id]">
+          <button mat-mini-fab class="btn_slot" [ngClass]="{ 'btn_inactive': slot.active == false}" routerLinkActive="activebutton">'
+          </button>
         </a>
+      </nav>
     </div>
   </form>
 </div>
+
+<app-name-dropdown></app-name-dropdown>
+
 <mat-divider></mat-divider>
-<!-- <h3>
-   <a [title]="slot.brew_name + ' details'" [routerLink]="['/slot', slot.id]">
-       {{ slot.brew_name }}
-   </a>
-   </h3>
-   
-   <p *ngIf="product.description">
-   Description: {{ product.description }}
-   </p>
-   
-   <button (click)="share()">
-   Share
-   </button>
-   
-   <app-product-alerts
-   [product]="product" 
-   (notify)="onNotify()">
-   </app-product-alerts> -->
-<!-- 
-   Copyright Google LLC. All Rights Reserved.
-   Use of this source code is governed by an MIT-style license that
-   can be found in the LICENSE file at https://angular.io/license
-   -->

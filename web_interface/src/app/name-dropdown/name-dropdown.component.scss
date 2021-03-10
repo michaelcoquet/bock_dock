@@ -1,0 +1,25 @@
+@import '~@angular/material/theming';
+
+.slot-select-dropdown{
+    text-align: center;
+    align-content: center;
+}
+
+.label {
+    color: map-get($mat-deep-purple, 500);
+    font-size: 100%;
+  }
+  
+  .option {
+    color: map-get($mat-deep-purple, 500);
+    font-size: 100%;
+  }
+  
+  ::ng-deep .mat-select-value {    
+    color: map-get($mat-deep-purple, 500);  
+  }
+  
+  ::ng-deep .mat-select-panel {
+    background-color: map-get($mat-amber, 400);
+  }
+  

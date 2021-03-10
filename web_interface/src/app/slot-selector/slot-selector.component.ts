@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup} from '@angular/forms';
 
 import { slots } from '../slots';
+import { NameDropdownComponent } from '../name-dropdown/name-dropdown.component';
 
 @Component({
   selector: 'app-slot-selector',
@@ -12,18 +13,14 @@ import { slots } from '../slots';
 export class SlotSelectorComponent  implements OnInit {
   slots = slots;
   options: FormGroup;
-  hideRequiredControl = new FormControl(false);
-  floatLabelControl = new FormControl('auto');
-  brewControl = new FormControl('', Validators.required);
-  selectFormControl = new FormControl('', Validators.required);
 
   constructor(
     private route: ActivatedRoute,
     fb: FormBuilder,
   ) {
     this.options = fb.group({
-      hideRequired: this.hideRequiredControl,
-      floatLabel: this.floatLabelControl,
+      // hideRequired: this.hideRequiredControl,
+      // floatLabel: this.floatLabelControl,
     });
   }
   ngOnInit() {
