@@ -1,25 +1,60 @@
-@import '~@angular/material/theming';
+@import "~@angular/material/theming";
 
-.slot-select-dropdown{
-    text-align: center;
-    align-content: center;
+.slot-select-dropdown {
+  text-align: center;
+  align-content: center;
+  margin-top: -7px;
+  margin-left: 10%;
 }
 
 .label {
-    color: map-get($mat-deep-purple, 500);
-    font-size: 100%;
-  }
-  
-  .option {
-    color: map-get($mat-deep-purple, 500);
-    font-size: 100%;
-  }
-  
-  ::ng-deep .mat-select-value {    
-    color: map-get($mat-deep-purple, 500);  
-  }
-  
-  ::ng-deep .mat-select-panel {
+  color: map-get($mat-deep-purple, 500);
+  font-size: 100%;
+}
+
+.option {
+  color: map-get($mat-deep-purple, 900);
+  background-color: map-get($mat-amber, 400);
+  font-size: 100%;
+}
+
+
+::ng-deep .mat-paginator-icon{
+  background-color: map-get($mat-deep-purple, 900);
+}
+
+::ng-deep .mat-select-panel {
     background-color: map-get($mat-amber, 400);
-  }
-  
+}
+
+::ng-deep .mat-form-field-infix{
+     background-color: map-get($mat-amber, 400);
+}
+
+::ng-deep .mat-select{
+   background-color: map-get($mat-amber, 400);
+}
+
+::ng-deep .mat-select-value{
+   color: map-get($mat-deep-purple, 900);
+}
+
+::ng-deep .mat-form-field-type-mat-select .mat-form-field-label {
+  color: map-get($mat-deep-purple, 900);
+}
+
+// ::ng-deep .mat-form-field-type-mat-select .mat-form-field-label, .mat-select-value {
+//   color: red;
+// }
+
+// ::ng-deep .mat-select-value {
+//   color: map-get($mat-deep-purple, 500);
+// }
+
+// ::ng-deep .mat-select-panel {
+//   background-color: map-get($mat-amber, 400);
+// }
+
+// ::ng-deep .mat-select-content {
+//   background-color: red;
+// }

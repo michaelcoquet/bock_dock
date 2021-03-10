@@ -26,6 +26,7 @@
 }
 
 .mat-divider {
+  border-top-width: 5px;
   margin: 10%;
   margin-top: 0%;
   border-top-color: map-get($mat-deep-purple, 500);
@@ -45,4 +46,18 @@
   justify-content: center;
   align-items: center;
   margin: 5% 0;
+}
+
+.temp_item{
+  display: flex;
+  margin: 5%;
+}
+
+.temp_display {
+  display: grid;
+  text-align: center;
+  justify-content: center;
+  align-self: center;
+  align-content: center;
+  align-items: center;
 }

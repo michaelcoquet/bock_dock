@@ -1,13 +1,12 @@
 <div class="header">
   <h1><b>Keg Slots</b></h1>
 </div>
-
 <div class="example-container">
   <form [formGroup]="options">
-    <div *ngFor="let slot of slots">
+    <div *ngFor="let slot of keg_slots">
       <nav>
         <a [title]="slot.brew_name + ' details'" [routerLink]="['/slot/', slot.id]">
-          <button mat-mini-fab class="btn_slot" [ngClass]="{ 'btn_inactive': slot.active == false}" routerLinkActive="activebutton">'
+          <button mat-mini-fab class="btn_slot" [ngClass]="{ 'btn_inactive': slot.active == false}" routerLinkActive="activebutton" (click)="select_keg(slot.id)">'
           </button>
         </a>
       </nav>
@@ -15,6 +14,12 @@
   </form>
 </div>
 
-<app-name-dropdown></app-name-dropdown>
+
+<div class="temp_display">
+  <div class="temp_item">
+    <app-temperature-monitor></app-temperature-monitor>
+    <app-name-dropdown></app-name-dropdown>
+  </div>
+</div>
 
 <mat-divider></mat-divider>

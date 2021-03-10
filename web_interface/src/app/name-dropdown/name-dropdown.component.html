@@ -2,7 +2,7 @@
   <mat-form-field>
     <mat-label class="label">Select a keg</mat-label>
     <mat-select [formControl]="brewControl" required>
-      <mat-option *ngFor="let slot of slots" value="slot.brew_name" class="option">
+      <mat-option *ngFor="let slot of keg_slots" value="slot.brew_name" class="option">
         <option *ngIf="slot.active == true; else empty">Slot {{slot.id}}: {{slot.brew_name}}</option>
         <ng-template #empty>
           Slot {{slot.id}}: ---------------

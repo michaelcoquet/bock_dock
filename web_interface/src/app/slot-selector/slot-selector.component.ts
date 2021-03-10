@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {FormBuilder, FormGroup} from '@angular/forms';
 
-import { slots } from '../slots';
-import { NameDropdownComponent } from '../name-dropdown/name-dropdown.component';
+import { Slots } from '../slots';
 
 @Component({
   selector: 'app-slot-selector',
@@ -11,10 +10,15 @@ import { NameDropdownComponent } from '../name-dropdown/name-dropdown.component'
   styleUrls: ['./slot-selector.component.scss']
 })
 export class SlotSelectorComponent  implements OnInit {
-  slots = slots;
+  keg_slots = this.slots.get_all_slots();
   options: FormGroup;
 
+  select_keg(id: number) {
+    this.slots.set_selected_slot(id);
+  }
+
   constructor(
+    private slots: Slots,
     private route: ActivatedRoute,
     fb: FormBuilder,
   ) {

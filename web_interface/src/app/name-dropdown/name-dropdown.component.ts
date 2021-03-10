@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { ActivatedRoute } from '@angular/router';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
-import { slots } from '../slots';
+import { Slots } from '../slots';
 
 @Component({
     // tslint:disable-next-line:component-selector
@@ -11,13 +11,14 @@ import { slots } from '../slots';
     templateUrl: "./name-dropdown.component.html"
 })
 export class NameDropdownComponent {
-    slots = slots;
+    keg_slots = this.slots.get_all_slots();
     options: FormGroup;
     brewControl = new FormControl('', Validators.required);
     selectFormControl = new FormControl('', Validators.required);
   
     constructor(
       private route: ActivatedRoute,
+      private slots: Slots,
       fb: FormBuilder,
     ) {
       this.options = fb.group({
