@@ -10,11 +10,12 @@ import { Slots } from '../slots';
   styleUrls: ['./slot-selector.component.scss']
 })
 export class SlotSelectorComponent  implements OnInit {
-  keg_slots = this.slots.get_all_slots();
+  keg_slots = this.slots;
   options: FormGroup;
-
+  selected_slot:number;
+  
   select_keg(id: number) {
-    this.slots.set_selected_slot(id);
+    this.keg_slots.emit_selection(id);
   }
 
   constructor(
@@ -28,6 +29,10 @@ export class SlotSelectorComponent  implements OnInit {
     });
   }
   ngOnInit() {
+    this.keg_slots.selected_slot.subscribe(id => {
+      console.log(id);
+      this.selected_slot = id;
+    })
   }
 }
 /*

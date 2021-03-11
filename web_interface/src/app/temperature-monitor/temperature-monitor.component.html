@@ -1,0 +1,42 @@
+<ng-container *ngIf=
+    "
+    relative_temperature > warn_percentage && relative_temperature < (100 - warn_percentage);
+    then temp_norm; else temp_warn
+    ">
+</ng-container>
+
+<ng-template #temp_norm>
+    <mat-label class="label_norm">Current Temperature: {{current_temperature}} °C</mat-label>
+    
+    <mat-progress-bar [appProgressBarColor]="'green'"
+    [value]="relative_temperature">
+    </mat-progress-bar>
+</ng-template>
+
+<ng-template #temp_warn>
+    <ng-container *ngIf=
+        "
+        relative_temperature < warn_percentage; then temp_low; else temp_high
+        ">
+    </ng-container>
+</ng-template>
+
+<ng-template #temp_low>
+    <mat-label class="label_low">Current Temperature: {{current_temperature}} °C</mat-label>
+
+    <mat-progress-bar [appProgressBarColor]="'cyan'"
+    [value]="relative_temperature">
+    </mat-progress-bar>
+</ng-template>
+
+<ng-template #temp_high>
+    <mat-label class="label_high">Current Temperature: {{current_temperature}} °C</mat-label>
+
+    <mat-progress-bar [appProgressBarColor]="'red'"
+    [value]="relative_temperature">
+    </mat-progress-bar>
+</ng-template>
+
+<button mat-raised-button class="log_button">Temperature Logs</button>
+
+

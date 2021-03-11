@@ -52,7 +52,6 @@ import { Slots } from './slots';
   ]
 })
 export class AppModule {
-  public keg_slots: Slots;
 }
 
 platformBrowserDynamic().bootstrapModule(AppModule)

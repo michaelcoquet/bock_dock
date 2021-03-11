@@ -1,12 +1,20 @@
 import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class Slots {
-  private selected_slot:number = 0;
   private max_temp:number = 6.0;
   private min_temp:number = 1.0;
   private warn_percentage:number = 20;
   private current_temperature:number = 3.45;
+
+  private current_slot = 0;
+  public selected_slot = new Subject<number>();
+
+  emit_selection(id) {
+    this.selected_slot.next(id);
+    this.current_slot = id;
+  }
 
   private keg_slots = [
       {
@@ -83,6 +91,14 @@ export class Slots {
       }
     ];
 
+    get_selected_slot() {
+      return this.current_slot;
+    }
+
+    // set_selected_slot(id: number) {
+    //   this.selected_slot = id;
+    // }
+
     get_current_temp() {
       return this.current_temperature;
     }
@@ -105,14 +121,6 @@ export class Slots {
 
     get_all_slots() {
       return this.keg_slots;
-    }
-    
-    get_selected_slot() {
-      return this.selected_slot;
-    }
-
-    set_selected_slot(id: number) {
-      this.selected_slot = id;
     }
 
     set_current_temp(t: number) {

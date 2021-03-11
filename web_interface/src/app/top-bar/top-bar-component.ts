@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 
+import { Slots } from '../slots'
+
 /**
  * @title Toolbar overview
  */
@@ -9,12 +11,20 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['top-bar-component.scss'],
 })
 export class TopBarComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit(): void {
+  keg_slots = this.slots;
+  selected_slot:number;
+  
+  go_home() {
+    this.keg_slots.emit_selection(0);
   }
 
+  constructor(private slots: Slots,) { }
+
+  ngOnInit() {
+    this.keg_slots.selected_slot.subscribe(id => {
+      this.selected_slot = id;
+    })
+  }
 }
 
 /**  Copyright 2020 Google LLC. All Rights Reserved.

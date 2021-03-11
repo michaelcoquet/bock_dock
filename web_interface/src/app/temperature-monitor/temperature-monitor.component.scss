@@ -1,0 +1,23 @@
+@import '~@angular/material/theming';
+
+.label_norm {
+    color: map-get($mat-deep-purple, 500);
+    font-weight: bold;
+}
+
+.label_low {
+    color: cyan;
+    font-weight: bold;
+}
+
+.label_high {
+    color: red;
+    font-weight: bold;
+}
+
+.log_button {
+    color: map-get($mat-deep-purple, 500);
+    background-color: map-get($mat-amber, 400);
+    margin-top: 10px;
+    border: 2px solid map-get($mat-deep-purple, 400);
+}
