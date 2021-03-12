@@ -1,14 +1,38 @@
-<!-- <h1><div *ngIf="keg_slots.get_selected_slot() != 0"><h1>{{keg_slots.get_selected_slot()}}</h1></div></h1> -->
-<div class="brew_discription" *ngIf="keg_slots.get_selected_slot() != 0">
-    <form [formGroup]="brew_details">
-        <mat-form-field>
-            <h2><u>Brew Discription</u></h2>
-            <button mat-raised-button>Edit Batch</button>
-            <input matInput [readonly]="true" formControlName="brew_disc_control" placeholder="Brew Discription">
-            <h2><u>Current Batch</u></h2>
-            <button mat-raised-button>Batch Logs</button>
-            <app-temperature-monitor></app-temperature-monitor>
-        </mat-form-field>
-    </form>
+<div class="level_indicator">
+    <mat-form-field>
+        <input matInput [readonly]="true">
+        <app-level-monitor></app-level-monitor>
+    </mat-form-field>
 </div>
+<div class = "page_layout">
+        <mat-form-field>
+            <div class="d1">
+                <h2><u>Brew Discription</u></h2>
+                <button mat-raised-button class="batch_button">Edit Batch</button>
+            </div>
+          <input matInput [readonly]="true" placeholder="TODO: embed the thingspeak/blynk chart here">
+        </mat-form-field>
+      <mat-form-field>
+          <div class="d1">
+            <h2><u>Current Batch</u></h2>
+            <button mat-raised-button class="batch_button">Batch Logs</button>
+          </div>
+        <input matInput [readonly]="true" placeholder="TODO: embed the thingspeak/blynk chart here">
+      </mat-form-field>
+</div>
+
 <app-bottom-bar></app-bottom-bar>
+
+<!-- <mat-form-field class="do">
+    <div class="d2">
+        <h2><u>Brew Discription</u></h2>
+        <button mat-raised-button class="batch_button">Edit Batch</button>
+    </div>
+    <input matInput [readonly]="true" placeholder="Brew Discription">
+</mat-form-field>
+<mat-form-field class="do">
+    <div class="d1">
+        <input matInput [readonly]="true" placeholder="Current level">
+        <app-level-monitor></app-level-monitor>
+    </div>
+</mat-form-field> -->

@@ -1,0 +1,48 @@
+@import '~@angular/material/theming'; 
+
+.brew_details {
+    display: flex;
+    flex: 0 0 100%;
+    flex-direction: row;
+}
+
+.level_indicator {
+    align-content: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.d1 {
+    display: flex;
+    flex: 0 0 100%;
+    flex-direction: row;
+}
+
+.do {
+    display: flex;
+    flex: 0 0 56%;
+    flex-direction: row;
+}
+
+.d2 {
+    display: flex;
+    flex-direction: row;
+}
+
+.page_layout {
+    display: flex;
+    flex: 0 0 100%;
+    margin-bottom: 10%;
+    flex-direction: column;
+}
+
+.brew_charts {
+    display: flex;
+    flex: 0 0 80%;
+}
+
+.batch_button {
+    color: map-get($mat-deep-purple, 500);
+    margin-left: 20px;
+    border: 2px solid map-get($mat-deep-purple, 400);
+}

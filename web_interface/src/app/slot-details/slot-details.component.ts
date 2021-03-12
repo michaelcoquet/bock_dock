@@ -11,7 +11,8 @@ import { Slots } from "../slots";
 export class SlotDetailsComponent implements OnInit {
   keg_slots = this.slots;
   selected_slot: number;
-  brew_details: FormGroup;
+  brew_description: FormGroup;
+  brew_charts: FormGroup;
 
   constructor(
     private slots: Slots,

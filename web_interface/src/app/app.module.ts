@@ -17,8 +17,9 @@ import { DemoMaterialModule } from './material-module';
 import { BottomBarComponent } from './bottom-bar/bottom-bar.component';
 import { HomeComponent } from './home/home.component';
 import { TemperatureMonitorComponent } from './temperature-monitor/temperature-monitor.component';
-import {ProgressBarColor} from './temperature-monitor/progress-bar-color';
+import {ProgressBarColor} from './progress-bar-color';
 import { Slots } from './slots';
+import { LevelMonitorComponent } from './level-monitor/level-monitor.component';
 
 // Default MatFormField appearance to 'fill' as that is the new recommended approach and the
 // `legacy` and `standard` appearances are scheduled for deprecation in version 10.
@@ -44,6 +45,7 @@ import { Slots } from './slots';
     HomeComponent,
     TemperatureMonitorComponent,
     ProgressBarColor,
+    LevelMonitorComponent,
   ],
   bootstrap: [AppComponent],
   providers: [

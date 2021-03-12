@@ -5,7 +5,10 @@ import { Observable, Subject } from 'rxjs';
 export class Slots {
   private max_temp:number = 6.0;
   private min_temp:number = 1.0;
+  private max_level:number = 19.00;
+  private min_level:number = 0.75;
   private warn_percentage:number = 20;
+  private warn_level_percentage:number = 5;
   private current_temperature:number = 3.45;
 
   private current_slot = 0;
@@ -103,6 +106,10 @@ export class Slots {
       return this.current_temperature;
     }
 
+    get_current_level(id) {
+      return this.keg_slots[id-1].current_level;
+    }
+
     get_max_temp() {
       return this.max_temp;
     }
@@ -111,8 +118,20 @@ export class Slots {
       return this.min_temp;
     }
 
+    get_max_level() {
+      return this.max_level;
+    }
+
+    get_min_level() {
+      return this.min_level;
+    }
+
     get_warn_perc() {
       return this.warn_percentage;
+    }
+
+    get_warn_level_perc() {
+      return this.warn_level_percentage;
     }
 
     get_slot(id: number) {
@@ -135,9 +154,22 @@ export class Slots {
       this.min_temp = t;
     }
 
+    set_max_level(t: number) {
+      this.max_level = t;
+    }
+
+    set_min_level(t: number) {
+      this.min_level = t;
+    }
+
     set_warn_perc(p: number) {
       this.warn_percentage = p;
     }
+
+    set_warn_level_perc(p: number) {
+      this.warn_level_percentage = p;
+    }
+
 
     constructor() {}
 }
