@@ -10,12 +10,11 @@ import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import { AppComponent } from './app.component';
 import { TopBarComponent } from './top-bar/top-bar-component';
 import { NameDropdownComponent } from './name-dropdown/name-dropdown.component';
-import { SlotDetailsComponent } from './slot-details/slot-details.component';
+import { SlotDetailsComponent, DialogOverviewExampleDialog } from './slot-details/slot-details.component';
 import { SlotSelectorComponent } from './slot-selector/slot-selector.component';
 import { AppRoutingModule } from './app-routing.module';
 import { DemoMaterialModule } from './material-module';
 import { BottomBarComponent } from './bottom-bar/bottom-bar.component';
-import { HomeComponent } from './home/home.component';
 import { TemperatureMonitorComponent } from './temperature-monitor/temperature-monitor.component';
 import {ProgressBarColor} from './progress-bar-color';
 import { Slots } from './slots';
@@ -42,10 +41,10 @@ import { LevelMonitorComponent } from './level-monitor/level-monitor.component';
     SlotDetailsComponent,
     SlotSelectorComponent,
     BottomBarComponent,
-    HomeComponent,
     TemperatureMonitorComponent,
     ProgressBarColor,
     LevelMonitorComponent,
+    DialogOverviewExampleDialog,
   ],
   bootstrap: [AppComponent],
   providers: [

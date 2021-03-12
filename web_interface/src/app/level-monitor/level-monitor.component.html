@@ -1,0 +1,31 @@
+<ng-container *ngIf=
+    "
+    get_relative_level() > keg_slots.get_warn_level_perc() && get_relative_level() < (100 - keg_slots.get_warn_level_perc());
+    then temp_norm; else temp_warn
+    ">
+</ng-container>
+
+<ng-template #temp_norm>
+    <mat-label class="label_norm">Current Level: {{current_level}} L (remaining)</mat-label>
+    
+    <mat-progress-bar [appProgressBarColor]="'green'"
+    [value]="relative_level" class="level_indicator">
+    </mat-progress-bar>
+</ng-template>
+
+<ng-template #temp_warn>
+    <ng-container *ngIf=
+        "
+        get_relative_level() < keg_slots.get_warn_level_perc(); then temp_low;
+        ">
+    </ng-container>
+</ng-template>
+
+<ng-template #temp_low class="ind">
+    <mat-label class="label_low">Current Level: {{current_level}} L (remaining)</mat-label>
+
+    <mat-progress-bar [appProgressBarColor]="'red'"
+    [value]="get_relative_level()" class="level_indicator">
+    </mat-progress-bar>
+</ng-template>
+

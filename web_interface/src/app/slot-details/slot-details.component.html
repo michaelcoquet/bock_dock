@@ -4,35 +4,27 @@
         <app-level-monitor></app-level-monitor>
     </mat-form-field>
 </div>
-<div class = "page_layout">
-        <mat-form-field>
-            <div class="d1">
-                <h2><u>Brew Discription</u></h2>
-                <button mat-raised-button class="batch_button">Edit Batch</button>
+<div class="page_layout">
+    <mat-form-field [formGroup]="brew_form_group">
+        <div class="d1">
+            <h2><u>Brew Discription</u></h2>
+            <div class="d2">
+                <input matInput readonly="true" class="dates" placeholder="Kegging Date: ">
+                <input matInput readonly="true" class="dates" placeholder="Mashing Date: ">
+                <button mat-raised-button class="edit_button" (click)="openDialog()">Edit Batch</button>
             </div>
-          <input matInput [readonly]="true" placeholder="TODO: embed the thingspeak/blynk chart here">
-        </mat-form-field>
-      <mat-form-field>
-          <div class="d1">
+        </div>
+        <ng-container *ngIf="get_current_disc()">
+        </ng-container>
+        <input matInput  readonly="true" formControlName="brewControl" [(ngModel)]="brew_disc">
+    </mat-form-field>
+    <mat-form-field>
+        <div class="d3">
             <h2><u>Current Batch</u></h2>
             <button mat-raised-button class="batch_button">Batch Logs</button>
-          </div>
-        <input matInput [readonly]="true" placeholder="TODO: embed the thingspeak/blynk chart here">
-      </mat-form-field>
+        </div>
+        <input matInput readonly="true" placeholder="TODO: embed the thingspeak/blynk chart here">
+    </mat-form-field>
 </div>
 
 <app-bottom-bar></app-bottom-bar>
-
-<!-- <mat-form-field class="do">
-    <div class="d2">
-        <h2><u>Brew Discription</u></h2>
-        <button mat-raised-button class="batch_button">Edit Batch</button>
-    </div>
-    <input matInput [readonly]="true" placeholder="Brew Discription">
-</mat-form-field>
-<mat-form-field class="do">
-    <div class="d1">
-        <input matInput [readonly]="true" placeholder="Current level">
-        <app-level-monitor></app-level-monitor>
-    </div>
-</mat-form-field> -->

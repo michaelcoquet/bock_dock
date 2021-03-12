@@ -11,14 +11,14 @@ export class Slots {
   private warn_level_percentage:number = 5;
   private current_temperature:number = 3.45;
 
-  private current_slot = 0;
-  public selected_slot = new Subject<number>();
+  private current_slot;
+  public selected_slot = new Subject<any>();
 
-  emit_selection(id) {
-    this.selected_slot.next(id);
-    this.current_slot = id;
+  emit_selection(slot) {
+    this.selected_slot.next(slot);
+    this.current_slot = slot;
   }
-
+// mongodb api key: private: a40dafa4-0696-43f1-bfd6-d7f36bb2e9a7 public: kxhtngwu
   private keg_slots = [
       {
         id: 1,
@@ -94,10 +94,9 @@ export class Slots {
       }
     ];
 
-    get_selected_slot() {
+    get_current_slot() {
       return this.current_slot;
     }
-
     // set_selected_slot(id: number) {
     //   this.selected_slot = id;
     // }

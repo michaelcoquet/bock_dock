@@ -12,10 +12,10 @@ import { Slots } from '../slots';
 export class SlotSelectorComponent  implements OnInit {
   keg_slots = this.slots;
   options: FormGroup;
-  selected_slot:number;
+  selected_slot;
   
-  select_keg(id: number) {
-    this.keg_slots.emit_selection(id);
+  select_keg(slot) {
+    this.keg_slots.emit_selection(slot);
   }
 
   constructor(
@@ -29,9 +29,8 @@ export class SlotSelectorComponent  implements OnInit {
     });
   }
   ngOnInit() {
-    this.keg_slots.selected_slot.subscribe(id => {
-      console.log(id);
-      this.selected_slot = id;
+    this.keg_slots.selected_slot.subscribe(slot => {
+      this.selected_slot = slot;
     })
   }
 }

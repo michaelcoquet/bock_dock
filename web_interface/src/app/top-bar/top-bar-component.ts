@@ -17,7 +17,7 @@ export class TopBarComponent implements OnInit {
   go_home() {
     this.keg_slots.emit_selection(0);
   }
-
+  
   constructor(private slots: Slots,) { }
 
   ngOnInit() {
