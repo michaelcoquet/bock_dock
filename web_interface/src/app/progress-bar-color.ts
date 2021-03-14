@@ -3,7 +3,7 @@ import { Directive, Input, OnChanges, SimpleChanges, ElementRef } from '@angular
 @Directive({
   selector: '[appProgressBarColor]'
 })
-export class ProgressBarColor implements OnChanges{
+export class ProgressBarColor{
   static counter = 0;
 
   @Input() appProgressBarColor;
@@ -18,9 +18,9 @@ export class ProgressBarColor implements OnChanges{
     nativeEl.appendChild(this.styleEl);
   }
 
-  ngOnChanges(changes: SimpleChanges): void{
-    this.updateColor();
-  }
+  // ngOnChanges(changes: SimpleChanges): void{
+  //   this.updateColor();
+  // }
 
   updateColor(): void{
     // update dynamic style with the uniqueAttr
