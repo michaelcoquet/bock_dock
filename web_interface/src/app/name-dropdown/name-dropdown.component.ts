@@ -1,38 +1,56 @@
 import { Component, DoCheck } from "@angular/core";
-import { ActivatedRoute } from '@angular/router';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import { ActivatedRoute } from "@angular/router";
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
 
-import { Slots } from '../slots';
+import { Slots } from "../slots";
+import { Keg } from "../../types/Keg";
+import { takeUntil } from "rxjs/operators";
+import { Subject } from "rxjs";
 
 @Component({
-    // tslint:disable-next-line:component-selector
-    selector: "app-name-dropdown",
-    styleUrls: ["./name-dropdown.component.scss"],
-    templateUrl: "./name-dropdown.component.html"
+  // tslint:disable-next-line:component-selector
+  selector: "app-name-dropdown",
+  styleUrls: ["./name-dropdown.component.scss"],
+  templateUrl: "./name-dropdown.component.html",
 })
 export class NameDropdownComponent {
-    b:boolean;
-    keg_slots = this.slots;
-    selected_slot;
-    brew_form_group: FormGroup;
-    brewControl = new FormControl('', Validators.required);
-    selectFormControl = new FormControl('', Validators.required);
+  unsubscribe$: Subject<boolean> = new Subject();
 
-    make_selection(event) {
-      this.keg_slots.emit_selection(event.value);
-    }
+  kegs_list: Keg[];
+  selected_keg: Keg;
+  brew_form_group: FormGroup;
+  brewControl = new FormControl("", Validators.required);
 
-    constructor(
-      private route: ActivatedRoute,
-      private slots: Slots,
-      private fb: FormBuilder,
-    ) {}
-    ngOnInit() {
-      this.keg_slots.selected_slot.subscribe(slot => {
-        this.selected_slot = slot;
-      })
-      this.brew_form_group = this.fb.group({
-        brewControl: this.selected_slot,
-      })
-    }
+  make_selection(event) {
+    this.slots.select(event.value);
   }
+
+  constructor(
+    private route: ActivatedRoute,
+    private slots: Slots,
+    private fb: FormBuilder
+  ) {}
+  ngOnInit() {
+    this.slots
+      .getCurrent()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((kegs) => (this.kegs_list = kegs));
+    this.slots
+      .getSelected()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((sel) => (this.selected_keg = sel));
+    this.brew_form_group = this.fb.group({
+      brewControl: this.selected_keg,
+    });
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next(true);
+    this.unsubscribe$.complete();
+  }
+}

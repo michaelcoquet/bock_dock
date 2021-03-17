@@ -5,7 +5,7 @@
     </mat-form-field>
 </div>
 <div class="page_layout">
-    <mat-form-field [formGroup]="brew_form_group">
+    <mat-form-field>
         <div class="d1">
             <h2><u>Brew Discription</u></h2>
             <div class="d2">
@@ -14,9 +14,9 @@
                 <button mat-raised-button class="edit_button" (click)="openDialog()">Edit Batch</button>
             </div>
         </div>
-        <ng-container *ngIf="get_current_disc()">
+        <ng-container *ngIf="selected_keg != undefined">
+            <input matInput  readonly="true" [(ngModel)]="selected_keg.brew_description">
         </ng-container>
-        <input matInput  readonly="true" formControlName="brewControl" [(ngModel)]="brew_disc">
     </mat-form-field>
     <mat-form-field>
         <div class="d3">

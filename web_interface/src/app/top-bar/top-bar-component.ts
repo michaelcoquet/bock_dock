@@ -14,16 +14,13 @@ export class TopBarComponent implements OnInit {
   keg_slots = this.slots;
   selected_slot:number;
   
-  go_home() {
-    this.keg_slots.emit_selection(0);
-  }
+  // go_home() {
+  //   this.slots.select(null);
+  // }
   
   constructor(private slots: Slots,) { }
 
   ngOnInit() {
-    this.keg_slots.selected_slot.subscribe(id => {
-      this.selected_slot = id;
-    })
   }
 }
 

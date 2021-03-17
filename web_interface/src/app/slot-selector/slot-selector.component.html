@@ -3,9 +3,9 @@
 </div>
 <div class="example-container">
   <form [formGroup]="options">
-    <div *ngFor="let slot of keg_slots.get_all_slots()">
+    <div *ngFor="let slot of kegs_data">
       <nav>
-        <a mat-mini-fab class="btn_slot" [ngClass]="{ 'btn_inactive': slot.active == false}"  (click)="select_keg(slot)" [title]="slot.brew_name + ' details'" [routerLink]="['/slot/', slot.id]">
+        <a mat-mini-fab class="btn_slot" [ngClass]="{ 'btn_inactive': slot.active == false}"  (click)="select_keg(slot)" [title]="slot.brew_name + ' details'" [routerLink]="['/slot/', slot.slot_id]">
         </a>
       </nav>
     </div>
