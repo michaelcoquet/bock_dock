@@ -17,18 +17,18 @@ export class Slots {
   private selected$: BehaviorSubject<Keg>;
   private kegs$: Subject<Keg[]> = new Subject();
   private kegs: Keg[];
-  private homekeg: Keg = {
-    active: false,
+  public homekeg: Keg = {
+    active: 0,
     brew_description: "home",
     brew_name: "home",
-    createdAt: "home",
+    create_date: "home",
     current_level: 0.0,
     finish_date: "home",
-    id: "home",
+    batch_id: "home",
     kegging_date: "home",
     mashing_date: "home",
     slot_id: 0,
-    updatedAt: "home",
+    comment: "home",
   }
 
   getSelected(): Observable<Keg> {
@@ -48,8 +48,8 @@ export class Slots {
   }
   
   constructor(public restApi: RestApiService) {
-    restApi.getKegs().subscribe(kegs => {
-      kegs.sort(this.compare);
+    restApi.getActive().subscribe(kegs => {
+      kegs["Items"].sort(this.compare);
       this.kegs$.next(kegs);
     });
     this.selected$ = new BehaviorSubject(this.homekeg);

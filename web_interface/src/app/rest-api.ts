@@ -28,7 +28,7 @@ export class RestApiService {
   }  
 
   // HttpClient API get() method => Fetch Kegs list
-  getKegs(): Observable<Keg[]> {
+  getActive(): Observable<Keg[]> {
     return this.http.get<Keg[]>(this.apiURL + '/keg-slots/')
     .pipe(
       retry(1),
@@ -54,35 +54,13 @@ export class RestApiService {
     )
   }  
 
-  codifyKeg(Keg):any {
-    var out_json = {
-      "active": String(Keg.active),
-      "brew_description": String(Keg.brew_description),
-      "brew_name": String(Keg.brew_name),
-      "createdAt": String(Keg.createdAt),
-      "current_level": String(Keg.current_level),
-      "finish_date": String(Keg.finish_date),
-      "id": String(Keg.id),
-      "kegging_date": String(Keg.kegging_date),
-      "mashing_date": String(Keg.mashing_date),
-      "slot_id": String(Keg.slot_id),
-      "updatedAt": String(Keg.updatedAt),
-    }
-    return out_json;
-  }
-
-  updateCurrent(slot_id, Keg): any {
+  updateCurrent(slot, Keg): any {
     var update_command = {
-      "key_sid": String(slot_id),
-      "item": this.codifyKeg(Keg),
+      "key_id": slot.batch_id,
+      "key_date": slot.create_date,
+      "item": Keg,
     }
-    var id_fuk:Keg;
-    var payload="1"
-    var temp = JSON.stringify(update_command);
-    var response = this.http.post(this.apiURL + '/update-current', payload, this.httpOptions);
-    response.subscribe((data: Keg) => id_fuk = data);
-    console.log(id_fuk);
-    return response
+    return this.http.post(this.apiURL + '/update-current', update_command, this.httpOptions)
     .pipe(
       retry(1),
       catchError(this.handleError)

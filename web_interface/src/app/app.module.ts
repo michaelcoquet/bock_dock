@@ -10,7 +10,7 @@ import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import { AppComponent } from './app.component';
 import { TopBarComponent } from './top-bar/top-bar-component';
 import { NameDropdownComponent } from './name-dropdown/name-dropdown.component';
-import { SlotDetailsComponent, DialogOverviewExampleDialog } from './slot-details/slot-details.component';
+import { SlotDetailsComponent } from './slot-details/slot-details.component';
 import { SlotSelectorComponent } from './slot-selector/slot-selector.component';
 import { AppRoutingModule } from './app-routing.module';
 import { DemoMaterialModule } from './material-module';
@@ -19,7 +19,7 @@ import { TemperatureMonitorComponent } from './temperature-monitor/temperature-m
 import {ProgressBarColor} from './progress-bar-color';
 import { Slots } from './slots';
 import { LevelMonitorComponent } from './level-monitor/level-monitor.component';
-
+import { EditBatchDialog, NewBatchDialog } from './dialogs/dialogs';
 // Default MatFormField appearance to 'fill' as that is the new recommended approach and the
 // `legacy` and `standard` appearances are scheduled for deprecation in version 10.
 // This makes the examples that use MatFormField render the same in StackBlitz as on the docs site.
@@ -44,7 +44,8 @@ import { LevelMonitorComponent } from './level-monitor/level-monitor.component';
     TemperatureMonitorComponent,
     ProgressBarColor,
     LevelMonitorComponent,
-    DialogOverviewExampleDialog,
+    EditBatchDialog,
+    NewBatchDialog,
   ],
   bootstrap: [AppComponent],
   providers: [

@@ -39,7 +39,7 @@ export class NameDropdownComponent {
     this.slots
       .getCurrent()
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe((kegs) => (this.kegs_list = kegs));
+      .subscribe((kegs) => (this.kegs_list = kegs["Items"]));
     this.slots
       .getSelected()
       .pipe(takeUntil(this.unsubscribe$))

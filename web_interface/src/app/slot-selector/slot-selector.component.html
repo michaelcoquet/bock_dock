@@ -3,19 +3,27 @@
 </div>
 <div class="example-container">
   <form [formGroup]="options">
-    <div *ngFor="let slot of kegs_data">
-      <nav>
-        <a mat-mini-fab class="btn_slot" [ngClass]="{ 'btn_inactive': slot.active == false}"  (click)="select_keg(slot)" [title]="slot.brew_name + ' details'" [routerLink]="['/slot/', slot.slot_id]">
+    {{build_dummy_buttons()}}
+    <div *ngFor="let slot of dummy; let i = index" [attr.data-index]="i">
+      <div *ngIf="slot != undefined; else hide">
+        <div *ngIf="slot.active == 1; else hide">
+          <nav>
+            <a mat-mini-fab class="btn_slot" [ngClass]="{ 'btn_inactive': false }"  (click)="select_keg(slot)" [title]="slot.brew_name + ' details'" [routerLink]="['/slot/', slot.slot_id]">
+            </a>
+          </nav>
+        </div>
+      </div>
+      <ng-template #hide>
+        <a mat-mini-fab class="btn_slot" [ngClass]="{ 'btn_inactive': true }"  (click)="NewBatchDialog(i+1)" [title]="'create new batch'" [routerLink]="['/home']">
         </a>
-      </nav>
+      </ng-template>
     </div>
   </form>
 </div>
 
-
 <div class="temp_display">
   <div class="temp_item">
-    <app-temperature-monitor></app-temperature-monitor>
+    <app-temperature-monitor></app-temperature-monitor>7
     <app-name-dropdown></app-name-dropdown>
   </div>
 </div>

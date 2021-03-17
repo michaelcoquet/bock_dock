@@ -1,49 +1,59 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
 
-import { Slots } from '../slots';
+import { Slots } from "../slots";
+import { Keg } from "../../types/Keg";
+import { takeUntil } from "rxjs/operators";
+import { Subject } from "rxjs";
 
 @Component({
-  selector: 'app-level-monitor',
-  templateUrl: './level-monitor.component.html',
-  styleUrls: ['./level-monitor.component.scss']
+  selector: "app-level-monitor",
+  templateUrl: "./level-monitor.component.html",
+  styleUrls: ["./level-monitor.component.scss"],
 })
 export class LevelMonitorComponent {
-  b:boolean;
-  keg_slots = this.slots;
-  selected_slot;
-  brew_form_group: FormGroup;
-  brewControl = new FormControl('', Validators.required);
-  selectFormControl = new FormControl('', Validators.required);
-  current_level:number;
-  relative_level:number;
-  t:number;
+  unsubscribe$: Subject<boolean> = new Subject();
 
-  // make_selection(event) {
-  //   this.keg_slots.emit_selection(event.value);
-  // }
+  private selected_keg: Keg;
+  keg_slots: Slots;
 
-  // get_current_level() {
-  //   this.current_level = Number((Math.round(this.keg_slots.get_current_slot().current_level * 100) / 100).toFixed(2));
-  //   return this.current_level;
-  // }
+  get_current_level() {
+    var current_level = Number(
+      (
+        Math.round(this.selected_keg.current_level * 100) / 100
+      ).toFixed(2)
+    );
+    return current_level;
+  }
 
-  // get_relative_level() {
-  //   this.relative_level = (this.get_current_level() - this.keg_slots.get_min_level())/(this.keg_slots.get_max_level() - this.keg_slots.get_min_level()) * 100;
-  //   return this.relative_level;
-  // }
+  get_relative_level() {
+    var relative_level =
+      ((this.get_current_level() - this.slots.min_level) /
+        (this.slots.max_level - this.slots.min_level)) *
+      100;
+    return relative_level;
+  }
 
   constructor(
     private route: ActivatedRoute,
     private slots: Slots,
-    private fb: FormBuilder,
-  ) {
-    // this.selected_slot = slots.selected_slot;
-  }
+    private fb: FormBuilder
+  ) {this.keg_slots =  slots;}
   ngOnInit() {
-    // this.keg_slots.selected_slot.subscribe(slot => {
-    //   this.selected_slot = slot;
-    // })
+    this.slots
+      .getSelected()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((sel) => (this.selected_keg = sel));
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next(true);
+    this.unsubscribe$.complete();
   }
 }

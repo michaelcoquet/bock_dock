@@ -2,11 +2,17 @@ import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { RestApiService } from "../rest-api";
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from "@angular/material/dialog";
 
 import { Slots } from "../slots";
 import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
 import { Keg } from "src/types/Keg";
+import { NewBatchDialog } from "../dialogs/dialogs";
 
 @Component({
   selector: "app-slot-selector",
@@ -16,34 +22,58 @@ import { Keg } from "src/types/Keg";
 export class SlotSelectorComponent implements OnInit {
   unsubscribe$: Subject<boolean> = new Subject();
 
-  kegs_data: any;
+  new_keg: Keg = this.slots.homekeg;
+
+  kegs_data: Keg[];
   options: FormGroup;
+  dummy: Keg[] = [];
+
+  loop_counter = 0;
+  increment_loop_counter() {
+    this.loop_counter = this.loop_counter + 1;
+  }
+  reset_loop_counter() {
+    this.loop_counter = 0;
+  }
 
   select_keg(slot) {
-    var temp_keg:Keg = {
-      "active": false,
-      "brew_description": "beer420",
-      "brew_name": "3245",
-      "createdAt": "2asdfffffff",
-      "current_level": 19,
-      "finish_date": "fffff",
-      "id": "fffffffffffffffffffffffffffffff",
-      "slot_id": 4,
-      "kegging_date": "1234",
-      "mashing_date": "124",
-      "updatedAt": "2021-03-15T06:35:23.127Z"
-    }
-    var resp: any;
-    if(slot.active == false)
-      this.restApi.updateCurrent(slot.slot_id, temp_keg).subscribe(response => resp = response);
     this.slots.select(slot);
+  }
+
+  NewBatchDialog(id): void {
+    this.new_keg.slot_id = id;
+    const dialogRef = this.dialog.open(NewBatchDialog, {
+      width: "100%",
+      data: this.new_keg,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log("New Batch Wizard Closed");
+      this.new_keg = result;
+    });
+  }
+
+  build_dummy_buttons() {
+    if (this.kegs_data != undefined) {
+      if (this.kegs_data.length > 8) {
+        throw new Error("ERROR: fatal, must be less than eight active kegs");
+      } else {
+        for (let i = 0; i < 8; i++) {
+          if (this.kegs_data[i] == undefined) continue;
+          if (this.kegs_data[i].slot_id != i)
+            this.dummy[this.kegs_data[i].slot_id - 1] = this.kegs_data[i];
+        }
+      }
+    }
+    return;
   }
 
   constructor(
     private slots: Slots,
     private route: ActivatedRoute,
     private restApi: RestApiService,
-    fb: FormBuilder,
+    public dialog: MatDialog,
+    fb: FormBuilder
   ) {
     this.options = fb.group({
       // hideRequired: this.hideRequiredControl,
@@ -51,7 +81,10 @@ export class SlotSelectorComponent implements OnInit {
     });
   }
   ngOnInit() {
-    this.slots.getCurrent().pipe(takeUntil(this.unsubscribe$)).subscribe(kegs => this.kegs_data = kegs);
+    this.slots
+      .getCurrent()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((kegs) => (this.kegs_data = kegs["Items"]));
   }
 
   ngOnDestroy() {

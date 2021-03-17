@@ -1,0 +1,32 @@
+@import "~@angular/material/theming";
+
+.name_area {
+  grid-area: NAME;
+}
+.id_area {
+  grid-area: ID;
+}
+.keg_area {
+  grid-area: KEG;
+}
+.mash_area {
+  grid-area: MASH;
+}
+.desc_area {
+  grid-area: DESC;
+}
+.head_area {
+  font-size: large;
+  text-align: center;
+}
+.container {
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+  grid-template-rows: auto;
+  grid-template-areas:
+    "ID ID ID ."
+    "NAME NAME NAME ."
+    "KEG KEG MASH MASH"
+    "DESC DESC DESC DESC";
+}
+

@@ -15,6 +15,7 @@ import { Slots } from "../slots";
 import { Keg } from "../../types/Keg";
 import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
+import { EditBatchDialog } from "../dialogs/dialogs";
 
 @Component({
   selector: "app-slot-details",
@@ -34,8 +35,8 @@ export class SlotDetailsComponent implements OnInit {
     public dialog: MatDialog
   ) {}
 
-  openDialog(): void {
-    const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
+  EditDialog(): void {
+    const dialogRef = this.dialog.open(EditBatchDialog, {
       width: "250px",
       data: { name: this.name, animal: this.animal },
     });
@@ -55,25 +56,5 @@ export class SlotDetailsComponent implements OnInit {
   ngOnDestroy() {
     this.unsubscribe$.next(true);
     this.unsubscribe$.complete();
-  }
-}
-
-export interface DialogData {
-  animal: string;
-  name: string;
-}
-
-@Component({
-  selector: "dialog-overview-example-dialog",
-  templateUrl: "edit_batch_dialog.html",
-})
-export class DialogOverviewExampleDialog {
-  constructor(
-    public dialogRef: MatDialogRef<DialogOverviewExampleDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
-  ) {}
-
-  onNoClick(): void {
-    this.dialogRef.close();
   }
 }
