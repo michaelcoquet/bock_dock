@@ -4,9 +4,11 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from "@angular/material/dialog";
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators, FormControl} from '@angular/forms';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Keg } from "../../types/Keg";
+import { MY_FORMATS } from "../../types/Dates";
 
 export interface DialogData {
     animal: string;
@@ -36,15 +38,23 @@ export interface DialogData {
   export class NewBatchDialog implements OnInit{
     firstFormGroup: FormGroup;
     secondFormGroup: FormGroup;
+
     constructor(
       public dialogRef: MatDialogRef<NewBatchDialog>,
       private _formBuilder: FormBuilder,
       @Inject(MAT_DIALOG_DATA) public data: Keg
     ) {
       data.active = 1;
-      data.create_date = "TODO: SET TIMESTAMP FOR NOW";
+      data.create_date = String(Date.now());
+      data.kegging_date = "Set in Step 3";
+      data.batch_id = this.build_id();
     }
   
+    build_id(): string {
+      var uuidValue=uuidv4();
+      return uuidValue;
+    }
+
     onNoClick(): void {
       this.dialogRef.close();
     }

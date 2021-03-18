@@ -24,9 +24,10 @@
   grid-template-columns: 25% 25% 25% 25%;
   grid-template-rows: auto;
   grid-template-areas:
-    "ID ID ID ."
-    "NAME NAME NAME ."
-    "KEG KEG MASH MASH"
+    "ID ID ID ID"
+    "NAME NAME NAME NAME"
+    "KEG KEG KEG KEG"
+    "MASH MASH MASH MASH"
     "DESC DESC DESC DESC";
 }
 

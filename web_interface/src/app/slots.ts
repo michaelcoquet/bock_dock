@@ -19,16 +19,16 @@ export class Slots {
   private kegs: Keg[];
   public homekeg: Keg = {
     active: 0,
-    brew_description: "home",
-    brew_name: "home",
-    create_date: "home",
+    brew_description: "Describe this batch here (give whatever details are important)",
+    brew_name: "New Batch Name",
+    create_date: "",
     current_level: 0.0,
-    finish_date: "home",
-    batch_id: "home",
-    kegging_date: "home",
-    mashing_date: "home",
+    finish_date: "",
+    batch_id: "",
+    kegging_date: "",
+    mashing_date: "",
     slot_id: 0,
-    comment: "home",
+    comment: "",
   }
 
   getSelected(): Observable<Keg> {

@@ -2,43 +2,44 @@
 <mat-vertical-stepper [linear]="false" #stepper>
   <mat-step [stepControl]="firstFormGroup">
     <!-- <form [formGroup]="firstFormGroup"> -->
-      <ng-template matStepLabel>Enter Batch Details</ng-template>
-      <div mat-dialog-content class="container">
-        <mat-form-field class="name_area">
-          <mat-label>Brew Name:</mat-label>
-          <input matInput [(ngModel)]="data.brew_name">
-        </mat-form-field>
-        <mat-form-field class="id_area">
-          <mat-label>Batch ID#:</mat-label>
-          <input matInput [(ngModel)]="data.batch_id">
-        </mat-form-field>
-        <mat-form-field class="keg_area">
-          <mat-label>Kegging Date</mat-label>
-            <input matInput [(ngModel)]="data.kegging_date">
-          </mat-form-field>
-        <mat-form-field class="mash_area">
-          <mat-label>Mashing Date:</mat-label>
-          <input matInput [(ngModel)]="data.mashing_date">
-        </mat-form-field>
-        <mat-form-field class="desc_area">
-          <mat-label>Brew Description:</mat-label>
-          <textarea matInput [(ngModel)]="data.brew_description" rows="10"></textarea>
-        </mat-form-field>
-        <mat-datepicker></mat-datepicker>
-      </div>
-      <div mat-dialog-actions align="center">
-        <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Save</button>
-        <span class="spacer"></span>
-        <button mat-button (click)="onNoClick()">Cancel</button>
-      </div>
+    <ng-template matStepLabel>Enter Batch Details</ng-template>
+    <div mat-dialog-content class="container">
+      <mat-form-field class="name_area">
+        <mat-label>Brew Name:</mat-label>
+        <input matInput [(ngModel)]="data.brew_name">
+      </mat-form-field>
+      <mat-form-field class="id_area">
+        <mat-label>Batch ID#:</mat-label>
+        <input matInput [(ngModel)]="data.batch_id" readonly="true">
+      </mat-form-field>
+      <mat-form-field class="keg_area">
+        <mat-label>Kegging Date</mat-label>
+        <input matInput [(ngModel)]="data.kegging_date" readonly="true">
+      </mat-form-field>
+      <mat-form-field class="mash_area">
+        <mat-label>Mashing Date:</mat-label>
+          <input matInput [matDatepicker]="picker">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker touchUi #picker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field class="desc_area">
+        <mat-label>Brew Description:</mat-label>
+        <textarea matInput [(ngModel)]="data.brew_description" rows="10"></textarea>
+      </mat-form-field>
+      <mat-datepicker></mat-datepicker>
+    </div>
+    <div mat-dialog-actions align="center">
+      <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Save</button>
+      <span class="spacer"></span>
+      <button mat-button (click)="onNoClick()">Cancel</button>
+    </div>
     <!-- </form> -->
   </mat-step>
   <mat-step [stepControl]="secondFormGroup" label="Tare the scale">
     <form [formGroup]="secondFormGroup">
       <mat-form-field>
         <mat-label>Address</mat-label>
-        <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY"
-               required>
+        <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY" required>
       </mat-form-field>
       <div>
         <button mat-button matStepperPrevious>Back</button>
@@ -63,20 +64,3 @@
     </div>
   </mat-step>
 </mat-vertical-stepper>
-
-
-
-
-<!-- export interface Keg {
-  active: number;
-  brew_description: string;
-  brew_name: string;
-  create_date: string;
-  current_level: number;
-  finish_date: string;
-  batch_id: string;
-  kegging_date: string;
-  mashing_date: string;
-  slot_id: number;
-  comment: string;
-} -->
