@@ -47,9 +47,10 @@ const char* http_password = "admin";
 void deviceReset();
 
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
+  Serial.print("Got a websocket event yay!!!!");
   if(type == WS_EVT_CONNECT){
     Serial.printf("ws[%s][%u] connect\n", server->url(), client->id());
-    client->printf("Hello Client %u :)", client->id());
+    client->printf("HELLO FROM ESP", client->id());
     client->ping();
   } else if(type == WS_EVT_DISCONNECT){
     Serial.printf("ws[%s][%u] disconnect\n", server->url(), client->id());
@@ -171,9 +172,9 @@ void setup(){
   ws.onEvent(onWsEvent);
   server.addHandler(&ws);
 
-  // events.onConnect([](AsyncEventSourceClient *client){
-  //   client->send("hello!",NULL,millis(),1000);
-  // });
+  events.onConnect([](AsyncEventSourceClient *client){
+    client->send("hello!",NULL,millis(),1000);
+  });
   server.addHandler(&events);
   
   server.addHandler(new SPIFFSEditor(http_username,http_password, MYFS));
