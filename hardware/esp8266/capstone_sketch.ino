@@ -1,99 +1,3 @@
-//#include <Arduino.h>
-//
-///*********
-//  Rui Santos
-//  Complete project details at http://randomnerdtutorials.com  
-//*********/
-//
-//#include <fs.h>
-//#include <Arduino.h>
-////#include <hash.h>
-//#include <ESP8266WiFi.h>
-//#include <DNSServer.h>
-
-//#include "AsyncJson.h"
-//#include <ArduinoJson.h>
-//#include <ESP8266mDNS.h>
-//
-//const int relayPin = D1;
-
-// AsyncWebServer server(80);
-
-//
-//// Variable to store the HTTP request
-//String header;
-//
-//// Auxiliar variables to store the current output state
-//String red_led_state = "off";
-//String green_led_state = "off";
-//String blue_led_state = "off";
-//
-//
-
-//
-//void setup() {
-//
-//  //configure the serial port
-//  Serial.begin(115200);
-//
-//  // id/name, placeholder/prompt, default, length
-//  AsyncWiFiManagerParameter custom_devicename("DeviceName", "Device Name", deviceName, 40);
-//  wifiManager.addParameter(&custom_devicename);
-//  wifiManager.setTimeout(180);
-//  if(!wifiManager.autoConnect("AutoConnectAP")) {
-//    Serial.println("failed to connect and hit timeout");
-//    deviceReset();
-//  }
-//  Serial.println("Wifi Connection Successful");
-//
-//  //start the web server
-//
-//  // or use this for auto generated name ESP + ChipID
-//  //wifiManager.autoConnect();
-//  // if you get here you have connected to the WiFi
-////  Serial.println("Connected.");
-//  SPIFFS.begin();
-//
-//  server.serveStatic("/", SPIFFS, "/index.html");
-//  server.serveStatic("/main-es5.js", SPIFFS, "/main-es5.js");
-//  server.serveStatic("/main-es2015.js", SPIFFS, "/main-es2015.js");
-//  server.serveStatic("/polyfills-es5.js", SPIFFS, "/polyfills-es5.js");
-//  server.serveStatic("/polyfills-es2015.js", SPIFFS, "/polyfills-es2015.js");
-//  server.serveStatic("/runtime-es5.js", SPIFFS, "/runtime-es5.js");
-//  server.serveStatic("/runtime-es2015.js", SPIFFS, "/runtime-es2015.js");
-//  server.serveStatic("/assets/img/logo.jpg", SPIFFS, "/assets/img/logo.jpg");
-//  server.serveStatic("/styles.css", SPIFFS, "/styles.css");
-//
-//  // server.onNotFound([]() {
-//  //   server.send(404, "text/plain", "404: Not Found");
-//  // });
-//
-//  // server.on("/tareCommand", HTTP_GET, [](AsyncWebServerRequest *request){
-//  //   Serial.println("server: got tare from client run tareCommand");
-//  //   request->send(200, "text/plain", "relay  on");
-//  // });
-//
-//  server.begin();
-//
-////  wifiManager.reboot();
-//}
-//
-//void tareCommand()
-//{
-//  Serial.println("Tare command received sending zero signal to selected slot");
-//}
-//
-//
-//void loop(){
-//}
-
-
-// Defaulut is SPIFFS, FatFS: only on ESP32, also choose partition scheme w/ ffat. 
-// Comment 2 lines below or uncomment only one of them
-
-//#define USE_LittleFS
-//#define USE_FatFS // Only ESP32
-
 #include <ArduinoOTA.h>
 #ifdef ESP32
  #include <FS.h>
@@ -136,8 +40,6 @@ AsyncEventSource events("/events");
 AsyncWiFiManager wifiManager(&server, &dnsServer);
 char deviceName[40];
 
-//const char* ssid = "dlink_C";
-//const char* password = "7D3705181B";
 const char* hostName = "esp-async";
 const char* http_username = "admin";
 const char* http_password = "admin";
@@ -168,36 +70,13 @@ void setup(){
   AsyncWiFiManagerParameter custom_devicename("DeviceName", "Device Name", deviceName, 40);
   wifiManager.addParameter(&custom_devicename);
   wifiManager.setTimeout(180);
-  if(!wifiManager.autoConnect("AutoConnectAP")) {
+  if(!wifiManager.autoConnect("Kegerator Connect")) {
     Serial.println("failed to connect and hit timeout");
     deviceReset();
   }
   Serial.println("Wifi Connection Successful");
 
   //start the web server
-
-  // or use this for auto generated name ESP + ChipID
-  //wifiManager.autoConnect();
-  // if you get here you have connected to the WiFi
-//  Serial.println("Connected.");
-
-  //Send OTA events to the browser
-  ArduinoOTA.onStart([]() { events.send("Update Start", "ota"); });
-  ArduinoOTA.onEnd([]() { events.send("Update End", "ota"); });
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    char p[32];
-    sprintf(p, "Progress: %u%%\n", (progress/(total/100)));
-    events.send(p, "ota");
-  });
-  ArduinoOTA.onError([](ota_error_t error) {
-    if(error == OTA_AUTH_ERROR) events.send("Auth Failed", "ota");
-    else if(error == OTA_BEGIN_ERROR) events.send("Begin Failed", "ota");
-    else if(error == OTA_CONNECT_ERROR) events.send("Connect Failed", "ota");
-    else if(error == OTA_RECEIVE_ERROR) events.send("Recieve Failed", "ota");
-    else if(error == OTA_END_ERROR) events.send("End Failed", "ota");
-  });
-  ArduinoOTA.setHostname(hostName);
-  ArduinoOTA.begin();
 
   MDNS.addService("http","tcp",80);
 
@@ -212,24 +91,22 @@ void setup(){
     Serial.print(F("FS mount failed\n"));  
   }
 
-  // ws.onEvent(onWsEvent);
-  // server.addHandler(&ws);
-
   events.onConnect([](AsyncEventSourceClient *client){
     client->send("hello!",NULL,millis(),1000);
   });
   server.addHandler(&events);
-
-#ifdef ESP32
-  server.addHandler(new SPIFFSEditor(MYFS, http_username,http_password));
-#elif defined(ESP8266)
+  
   server.addHandler(new SPIFFSEditor(http_username,http_password, MYFS));
-#endif
   
   server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(200, "text/plain", String(ESP.getFreeHeap()));
   });
 
+   server.on("/tareCommand", HTTP_GET, [](AsyncWebServerRequest *request){
+     Serial.println("server: got tare from client run tareCommand");
+     request->send(200, "text/plain", "relay  on");
+   });
+    
   server.serveStatic("/", MYFS, "/").setDefaultFile("index.html");
 
   server.onNotFound([](AsyncWebServerRequest *request){
@@ -296,7 +173,6 @@ void setup(){
 }
 
 void loop(){
-  ArduinoOTA.handle();
   ws.cleanupClients();
 }
 

@@ -19,6 +19,17 @@
   font-size: large;
   text-align: center;
 }
+.tare_info {
+  width: 100%;
+}
+.tare_button {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: auto;
+  grid-template-areas:     
+  "NAME NAME"
+  "ID KEG";
+}
 .container {
   display: grid;
   grid-template-columns: 25% 25% 25% 25%;
