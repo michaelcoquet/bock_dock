@@ -9,6 +9,8 @@ const int ledB = BLUE_LED;
 
 String uart_buf;
 
+void decode_msg();
+
 void setup() {
   // initialize ports:
   pinMode(ledR, OUTPUT);      
@@ -26,26 +28,34 @@ void loop() {
     char recv = Serial2.read();
     uart_buf += recv;
     if(recv == '\n') {
-      decode_buttons();
+      decode_msg();
       uart_buf = "";
     }
   }
 }
 
-void decode_buttons()
+
+// // parse incoming command
+// if(msg.c_str()[0] == "!")
+// {
+//   // signifies command for tm4c
+//   if(msg.c_str()[1] == "t")
+//   {
+//     // got tare command
+
+//   }
+// }
+// else
+// {
+//   #ifdef DEBUG_OUTPUT
+//     Serial.println("Error: unknown or irrelevant command");
+//   #endif
+// }
+
+
+void decode_msg()
 {
-  if(uart_buf[0] == '0')
-  {
-    toggle_led(ledR, uart_buf[1]);
-  }
-  else if(uart_buf[0] == '1')
-  {
-    toggle_led(ledG, uart_buf[1]);
-  }
-  else if(uart_buf[0] == '2')
-  {
-    toggle_led(ledB, uart_buf[1]);
-  }
+  Serial.println(uart_buf);
 }
 
 void toggle_led(int led_id, char led_state) {

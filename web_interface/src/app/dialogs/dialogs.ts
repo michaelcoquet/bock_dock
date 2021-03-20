@@ -78,14 +78,16 @@ export class NewBatchDialog implements OnInit {
   }
 
   esp_get_tare_ack(): void {
+    document.getElementById("overlay").style.display = "block";
     this.ws = new WebSocket("ws://192.168.0.30/ws");
     this.ws.onmessage = function(e){ 
-      if(e.data == "HELLO FROM ESP")
+      if(e.data == "Scale Succesfully Zeroed")
       {
-        console.log("VERY NICE WORKING WEBSOCKETS");
+        document.getElementById("overlay").style.display = "none";
+        console.log("socket connected");
       }
     };
-    this.ws.onopen = () => this.ws.send("HELLO FROM ANGULAR");
+    this.ws.onopen = () => this.ws.send("User Requests Tare Slot :" + this.data.slot_id);
 
   }
 
@@ -95,6 +97,13 @@ export class NewBatchDialog implements OnInit {
     });
     this.secondFormGroup = this._formBuilder.group({
       secondCtrl: ["", Validators.required],
+    });
+
+    window.addEventListener("beforeunload", function (e) {
+      var confirmationMessage = "\o/sdfsdfdssffff";
+      console.log("cond");
+      e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
+      return confirmationMessage;              // Gecko, WebKit, Chrome <34
     });
   }
 }
