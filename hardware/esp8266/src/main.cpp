@@ -48,6 +48,9 @@ const char *http_password = "admin";
 String uart_buf;
 AsyncWebSocketClient *client_buf;
 
+void uart_handler();
+void get_current_levels();
+void check_tare_acks();
 void deviceReset();
 
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
