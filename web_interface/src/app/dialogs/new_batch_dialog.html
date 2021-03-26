@@ -1,31 +1,34 @@
-<div id="overlay"></div>
+<div id="overlay">
+  <div class="spinner"></div>
+</div>
+
 <h1 mat-dialog-title class="head_area"><u>New Batch Wizard (Slot {{data.slot_id}})</u></h1>
 <mat-vertical-stepper [linear]="false" #stepper>
   <mat-step [stepControl]="firstFormGroup">
-    <!-- <form [formGroup]="firstFormGroup"> -->
+    <form [formGroup]="firstFormGroup">
     <ng-template matStepLabel>Enter Batch Details</ng-template>
     <div mat-dialog-content class="container">
       <mat-form-field class="name_area">
         <mat-label>Brew Name:</mat-label>
-        <input matInput [(ngModel)]="data.brew_name">
+        <input matInput [(ngModel)]="data.brew_name" [ngModelOptions]="{standalone: true}">
       </mat-form-field>
       <mat-form-field class="id_area">
         <mat-label>Batch ID#:</mat-label>
-        <input matInput [(ngModel)]="data.batch_id" readonly="true">
+        <input matInput [(ngModel)]="data.batch_id" readonly="true" [ngModelOptions]="{standalone: true}">
       </mat-form-field>
       <mat-form-field class="keg_area">
         <mat-label>Kegging Date</mat-label>
-        <input matInput [(ngModel)]="data.kegging_date" readonly="true">
+        <input matInput [(ngModel)]="data.kegging_date" readonly="true" [ngModelOptions]="{standalone: true}">
       </mat-form-field>
       <mat-form-field class="mash_area">
         <mat-label>Mashing Date:</mat-label>
-          <input matInput [matDatepicker]="picker">
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker touchUi #picker></mat-datepicker>
+        <input matInput [matDatepicker]="picker">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker touchUi #picker></mat-datepicker>
       </mat-form-field>
       <mat-form-field class="desc_area">
         <mat-label>Brew Description:</mat-label>
-        <textarea matInput [(ngModel)]="data.brew_description" rows="10"></textarea>
+        <textarea matInput [(ngModel)]="data.brew_description" [ngModelOptions]="{standalone: true}" rows="10"></textarea>
       </mat-form-field>
       <mat-datepicker></mat-datepicker>
     </div>
@@ -34,7 +37,7 @@
       <span class="spacer"></span>
       <button mat-button (click)="onCancelClick()" [mat-dialog-close]="data" cdkFocusInitial>Cancel</button>
     </div>
-    <!-- </form> -->
+    </form>
   </mat-step>
   <mat-step [stepControl]="secondFormGroup" label="Tare the scale">
     <form [formGroup]="secondFormGroup">
@@ -46,24 +49,25 @@
         <!-- Need to send signal to the micro controller here, to go into tare mode. Need to include the slot id information in this
         signal. Then if possible have this web app wait for an acknoledge from the microcontroller. -->
         <button mat-button matStepperPrevious class="id_area">Back</button>
-        <button mat-button matStepperNext class="keg_area" disabled="true">Next</button>
+        <button mat-button matStepperNext class="keg_area">Next</button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="thirdFormGroup" label="Kegging">
+    <form [formGroup]="thirdFormGroup">
+      <p>Check the level. If it reads zero keg your brew and hit next, otherwise go back and tare again.</p>
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button (click)="onKeggingDoneClick()" matStepperNext>Next</button>
       </div>
     </form>
   </mat-step>
   <mat-step>
-    <ng-template matStepLabel>Kegging</ng-template>
-    <p>You are now done.</p>
-    <div>
-      <button mat-button matStepperPrevious>Back</button>
-      <button mat-button (click)="stepper.reset()">Reset</button>
-    </div>
-  </mat-step>
-  <mat-step>
     <ng-template matStepLabel>Done</ng-template>
-    <p>You are now done.</p>
+    <p>Your batch will begin logging as soon as you hit done.</p>
     <div>
       <button mat-button matStepperPrevious>Back</button>
-      <button mat-button (click)="stepper.reset()">Reset</button>
+      <button mat-button (click)="onDoneClick()">Done</button>
     </div>
   </mat-step>
 </mat-vertical-stepper>

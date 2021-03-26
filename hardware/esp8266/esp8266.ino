@@ -1,14 +1,36 @@
 #include <ArduinoOTA.h>
+#ifdef ESP32
 #include <FS.h>
+#ifdef USE_LittleFS
+#define MYFS LITTLEFS
+#include "LITTLEFS.h"
+#elif defined(USE_FatFS)
+#define MYFS FFat
+#include "FFat.h"
+#else
+#define MYFS SPIFFS
+#include <SPIFFS.h>
+#endif
+#include <ESPmDNS.h>
+#include <WiFi.h>
+#include <AsyncTCP.h>
+#elif defined(ESP8266)
+#ifdef USE_LittleFS
+#include <FS.h>
+#define MYFS LittleFS
 #include <LittleFS.h>
+#elif defined(USE_FatFS)
+#error "FatFS only on ESP32 for now!"
+#else
+#define MYFS SPIFFS
+#endif
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #include <ESP8266mDNS.h>
+#endif
 #include <ESPAsyncWebServer.h>
 #include <ESPAsyncWiFiManager.h>
 #include <SPIFFSEditor.h>
-
-#define MYFS LittleFS
 // #define DEBUG_OUTPUT
 
 // SKETCH BEGIN
@@ -22,6 +44,9 @@ char deviceName[40];
 const char *hostName = "esp-async";
 const char *http_username = "admin";
 const char *http_password = "admin";
+
+String uart_buf;
+AsyncWebSocketClient *client_buf;
 
 void deviceReset();
 
@@ -55,6 +80,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
   }
   else if (type == WS_EVT_DATA)
   {
+    client_buf = client;
     AwsFrameInfo *info = (AwsFrameInfo *)arg;
     String msg = "";
     if (info->final && info->index == 0 && info->len == len)
@@ -169,6 +195,40 @@ void loop()
 {
   ArduinoOTA.handle();
   ws.cleanupClients();
+  uart_handler();
+}
+
+void uart_handler()
+{
+  if (Serial.available() > 0)
+  {
+    char recv = Serial.read();
+    uart_buf += recv;
+    if (recv == '\n')
+    {
+      check_tare_acks();
+      get_current_levels();
+      uart_buf = "";
+    }
+  }
+}
+
+void get_current_levels()
+{
+  if(uart_buf.substring(0, 2) == "!tc")
+  {
+    int sid = uart_buf.substring(3, 3).toInt();
+    Serial.println("got level for slot id: " + sid);
+  }
+}
+
+void check_tare_acks()
+{
+  if (uart_buf == "!t: ack\n")
+  {
+    Serial.println("Sending ack to websocket");
+    client_buf->printf("!t: ack\n");
+  }
 }
 
 void deviceReset()

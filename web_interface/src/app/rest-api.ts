@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, Subject, Subscriber, throwError } from 'rxjs';
-import { retry, catchError } from 'rxjs/operators';
+import { retry, catchError, delay } from 'rxjs/operators';
 
 import { Keg } from '../types/Keg';
 
@@ -44,14 +44,11 @@ export class RestApiService {
       catchError(this.handleError)
     )
   }  
-
+  d;
   // HttpClient API post() method => Create Keg
   createKeg(Keg): Observable<Keg> {
-    return this.http.post<Keg>(this.apiURL + '/keg-slots', JSON.stringify(Keg), this.httpOptions)
-    .pipe(
-      retry(1),
-      catchError(this.handleError)
-    )
+    this.http.post(this.apiURL + '/keg-slots', Keg, this.httpOptions).subscribe(response => console.log(response)); 
+    return this.http.post<Keg>(this.apiURL + '/keg-slots', JSON.stringify(Keg), this.httpOptions); 
   }  
 
   updateCurrent(slot, Keg): any {
