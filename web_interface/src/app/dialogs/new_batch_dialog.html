@@ -48,6 +48,10 @@
         <button mat-button class="name_area" (click)="esp_get_tare_ack()">Tare</button>
         <!-- Need to send signal to the micro controller here, to go into tare mode. Need to include the slot id information in this
         signal. Then if possible have this web app wait for an acknoledge from the microcontroller. -->
+        <div>
+          <mat-label>Current Reading:</mat-label>
+          <input matInput id="nb_readings" readonly="true">
+        </div>
         <button mat-button matStepperPrevious class="id_area">Back</button>
         <button mat-button matStepperNext class="keg_area">Next</button>
       </div>

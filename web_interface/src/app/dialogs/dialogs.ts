@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, Inject, Input, OnInit, SimpleChanges } from "@angular/core";
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -59,10 +59,12 @@ export class NewBatchDialog implements OnInit {
   thirdFormGroup: FormGroup;
   today= new Date();
   jstoday = '';
+  @Input() current_reading:number;
 
-  tare_placeholder = `Please place an empty, clean, dry keg into the selected slot (Slot ${this.data.slot_id}) then hit the tare button bellow.
+  tare_placeholder = `Please place an empty, clean, dry keg into the selected slot (Slot ${this.data.slot_id}) then hit the tare button bellow. 
+  Push tare again if needed, hit next when its reasonably close to zero.
     \n\n\n\n\n1    2    3    4
-    \n\n5    6    7    8\n\n           ______________________\n             front of kegerator`;
+    \n\n5    6    7    8\n\n______________________\n             front of kegerator`;
 
   instruction_placehoder = ``;
 
@@ -92,14 +94,9 @@ export class NewBatchDialog implements OnInit {
     console.log("TODO: stuff, save clicked go to next step");
   }
 
-  get_level(): number {
-    // TODO: get a smaple from the slot in quesion and return it
-    return 0;
-  }
-
   onDoneClick(): void {
     // get the starting level after kegging and put it in current level
-    this.data.current_level = this.get_level();
+    this.data.current_level = this.current_reading;
     // upload batch data to dynamodb
     this.restApi.createKeg(this.data);
     this.dialogRef.close();
@@ -110,15 +107,22 @@ export class NewBatchDialog implements OnInit {
   }
 
   esp_get_tare_ack(): void {
+    console.log("tare button pushed");
     document.getElementById("overlay").style.display = "block";
     this.ws = new WebSocket("ws://192.168.0.30/ws");
-    this.ws.onmessage = function(e){ 
-      if(e.data == "!t: ack\n")
+    this.ws.onmessage = function(e){
+      if(e.data.substring(0, 6) == "!t nb:")
       {
         document.getElementById("overlay").style.display = "none";
       }
+      if(e.data.substring(0, 6) == "!t nr:")
+      {
+        console.log(e.data);
+        // this.current_reading = e.data.substring(6);
+        document.getElementById("nb_readings").setAttribute("value", e.data.substring(6));
+      }
     };
-    this.ws.onopen = () => this.ws.send("!t" + this.data.slot_id);
+    this.ws.onopen = () => this.ws.send("!w nb:" + this.data.slot_id);
   }
 
   ngOnInit() {
@@ -138,5 +142,9 @@ export class NewBatchDialog implements OnInit {
       e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
       return confirmationMessage;              // Gecko, WebKit, Chrome <34
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    console.log(changes);
   }
 }

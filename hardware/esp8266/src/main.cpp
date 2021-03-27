@@ -31,6 +31,7 @@
 #include <ESPAsyncWebServer.h>
 #include <ESPAsyncWiFiManager.h>
 #include <SPIFFSEditor.h>
+
 // #define DEBUG_OUTPUT
 
 // SKETCH BEGIN
@@ -48,9 +49,15 @@ const char *http_password = "admin";
 String uart_buf;
 AsyncWebSocketClient *client_buf;
 
-void uart_handler();
-void get_current_levels();
-void check_tare_acks();
+bool is_new_batch = false;
+bool tare_ack = false;
+bool nb_readings = false;
+bool nb_stop = false;
+String web_msg = "";
+
+void uartHandler();
+void newBatchHandler();
+void decodeUart();
 void deviceReset();
 
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
@@ -111,7 +118,19 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
         }
       }
 
-      Serial.printf("%s\n", msg.c_str());
+      // for now just relay the command to the tm4c later might need something
+      // fancier
+
+      if (msg.substring(0, 6) == "!w nb:")
+      {
+        Serial.println("new batch");
+        web_msg = msg;
+        is_new_batch = true;
+      }
+      else
+      {
+        Serial.println(msg);
+      }
     }
   }
 }
@@ -178,12 +197,10 @@ void setup()
   ws.onEvent(onWsEvent);
   server.addHandler(&ws);
 
-  events.onConnect([](AsyncEventSourceClient *client) {
-    client->send("hello!", NULL, millis(), 1000);
-  });
   server.addHandler(&events);
 
-  server.addHandler(new SPIFFSEditor(http_username, http_password, MYFS));
+  server.addHandler(
+      new SPIFFSEditor(http_username, http_password, MYFS));
 
   server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/plain", String(ESP.getFreeHeap()));
@@ -198,10 +215,62 @@ void loop()
 {
   ArduinoOTA.handle();
   ws.cleanupClients();
-  uart_handler();
+  uartHandler();
+  newBatchHandler();
 }
 
-void uart_handler()
+int b_count = 0;
+void newBatchHandler()
+{
+  // 1. relay the new batch command to the tm4c
+  // 2. wait, in a non-blocking way, for ack from tm4c
+  //    indicating scale tared
+  // 3. receive readings from tm4c on uart until
+  //    stop command is received on the websocket
+  if (is_new_batch)
+  {
+    // 1.
+    if (b_count == 0)
+    {
+      b_count++;
+      Serial.println(web_msg);
+    }
+    // 2.
+    if (tare_ack && !nb_readings)
+    {
+      Serial.println("tare ack received");
+      nb_readings = true;
+    }
+    if (tare_ack && nb_readings)
+    {
+      // if (Serial.available() > 0)
+      // {
+      //   char recv = Serial.read();
+      //   uart_buf += recv;
+      //   if (recv == '\n')
+      //   {
+      //     if (uart_buf.substring(0, 6) == "!t nr:")
+      //     {
+      //       Serial.write("reading: ");
+      //       Serial.write(uart_buf.c_str());
+      //       client_buf->printf(uart_buf.c_str());
+      //     }
+      //     uart_buf = "";
+      //   }
+      // }
+    }
+    if (nb_stop)
+    {
+      Serial.println("new batch wizard finished");
+      is_new_batch = false;
+      tare_ack = false;
+      nb_readings = false;
+      nb_stop = false;
+    }
+  }
+}
+
+void uartHandler()
 {
   if (Serial.available() > 0)
   {
@@ -209,28 +278,24 @@ void uart_handler()
     uart_buf += recv;
     if (recv == '\n')
     {
-      check_tare_acks();
-      get_current_levels();
+      decodeUart();
       uart_buf = "";
     }
   }
 }
 
-void get_current_levels()
+void decodeUart()
 {
-  if(uart_buf.substring(0, 2) == "!tc")
+  if (uart_buf.substring(0, 6) == "!t nb:")
   {
-    int sid = uart_buf.substring(3, 3).toInt();
-    Serial.println("got level for slot id: " + sid);
+    tare_ack = true;
+    client_buf->printf(uart_buf.c_str());
   }
-}
-
-void check_tare_acks()
-{
-  if (uart_buf == "!t: ack\n")
+  if (uart_buf.substring(0, 6) == "!t nr:")
   {
-    Serial.println("Sending ack to websocket");
-    client_buf->printf("!t: ack\n");
+    Serial.write("reading: ");
+    Serial.write(uart_buf.c_str());
+    client_buf->printf(uart_buf.c_str());
   }
 }
 

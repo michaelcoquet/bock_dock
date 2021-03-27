@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <Energia.h>
 #include "HX711.h"
 
@@ -55,15 +56,14 @@ const int ledB = BLUE_LED;
 
 String uart_buf;
 
-void toggle_led(int led_id, char led_state);
-void decode_buttons();
-void decode_msg();
-void get_current_level(char slot_id);
-void start_slot(char slot_id);
-void tare_slot(char slot_id);
-void setup_slots();
-void uart_handler();
-void send_current_levels();
+void decodeUart();
+void getCurrentLevel(char slot_id);
+void startSlot(char slot_id);
+void tareSlot(char slot_id, int times);
+void setupSlots();
+void uartHandler();
+void sendCurrentLevel();
+void char_reading(char *chr, int slot_id, int times);
 
 typedef struct Slots
 {
@@ -78,7 +78,7 @@ typedef struct Slots
 Slot keg_slots[8];
 int selected_sid = 0;
 
-int counter = 0;
+int counter = 0; 
 
 void setup()
 {
@@ -86,7 +86,7 @@ void setup()
   pinMode(ledR, OUTPUT);
   pinMode(ledG, OUTPUT);
   pinMode(ledB, OUTPUT);
-  setup_slots();
+  setupSlots();
   Serial.begin(115200); //connected with USB
   delay(100);
   Serial2.begin(115200); //RS232: Rx = PD6; Tx = PD7
@@ -95,13 +95,12 @@ void setup()
 
 void loop()
 {
-  uart_handler();
-  send_current_levels();
+  uartHandler();
+  sendCurrentLevel();
 }
 
-void setup_slots()
+void setupSlots()
 {
-
   for (int i = 0; i < 8; i++)
   {
     keg_slots[i].selected = false;
@@ -110,7 +109,7 @@ void setup_slots()
   }
 }
 
-void uart_handler()
+void uartHandler()
 {
   if (Serial2.available() > 0)
   {
@@ -118,37 +117,28 @@ void uart_handler()
     uart_buf += recv;
     if (recv == '\n')
     {
-      decode_msg();
+      decodeUart();
       uart_buf = "";
     }
   }
 }
 
-void decode_msg()
+void decodeUart()
 {
 #ifdef DEBUG_OUTPUT
   Serial.print(uart_buf);
 #endif
 
   // parse incoming command
-  if (uart_buf[0] == '!')
+  if(uart_buf.substring(0, 6) == "!w nb:")
   {
-    // signifies command for tm4c
-    if (uart_buf[1] == 't')
-    {
-      tare_slot(uart_buf[2]);
-    }
-    // else if (uart_buf[1] == 'c')
-    // {
-    //   Serial.write("getting current level\n");
-    //   get_current_level(uart_buf[2]);
-    // }
+    // user requesting to start a new batch
+    startSlot(uart_buf[6]);
   }
-  else
+  if(uart_buf.substring(0, 6) == "!w rt:")
   {
-#ifdef DEBUG_OUTPUT
-    Serial.println("Error: unknown or irrelevant command");
-#endif
+    int i = uart_buf.substring(6, 7).toInt();
+    tareSlot(i, 10);
   }
 }
 
@@ -160,20 +150,26 @@ void decode_msg()
 //   Serial2.write("!tg" + reading);
 // }
 
-void start_slot(char slot_id)
+void startSlot(char slot_id)
 {
   int i = (int)slot_id;
-
+  i = i - '0';
+  i--;
+  Serial.write("slot id: ");
+  Serial.write(slot_id);
+  Serial.write("\n");
   keg_slots[i].scale.begin(DOUT[i], CLK[i]);
-  Serial.write("1\n");
-
   keg_slots[i].scale.set_scale(calibration_factor);
-  Serial.write("2\n");
-  keg_slots[i].scale.tare();
-  Serial.write("3\n");
-  Serial.write(keg_slots[i].scale.get_units());
+  tareSlot(i, 10);
+  Serial.write("Reading: ");
+  char chr_rdng[5];
+  char_reading(chr_rdng, i, 20);
+  Serial.write(chr_rdng);
+  Serial.write("\n");
   Serial.write("Success: sending ack back\n");
-  Serial2.write("!t: ack\n");
+  Serial2.write("!t nb:");
+  Serial2.write(slot_id);
+  Serial2.write("\n");
   keg_slots[i].selected = true;
   if (selected_sid != 0)
   {
@@ -181,36 +177,36 @@ void start_slot(char slot_id)
   }
 }
 
-void send_current_levels()
+void char_reading(char *chr, int slot_id, int times)
 {
-  if (counter == 100000)
+  float reading = keg_slots[slot_id].scale.get_units(times);
+  gcvt(reading, 6, chr);
+}
+
+void sendCurrentLevel()
+{
+  if (counter > 100000)
   {
     for (int i = 0; i < 8; i++)
     {
       if (keg_slots[i].selected)
       {
-        Serial2.write("!tcl: ");
-        Serial2.write(keg_slots[i].scale.get_units());
+        char r[6];
+        char_reading(r, i, 5);
+        Serial.write("sending reading: ");
+        Serial.write(r);
+        Serial.write("\n");
+        Serial2.write("!t nr:");
+        Serial2.write(r);
+        Serial2.write("\n");
       }
     }
+    counter = 0;
   }
   counter++;
 }
 
-void tare_slot(char slot_id)
+void tareSlot(char slot_id, int times)
 {
-  Serial.write("tare command received\n");
-  start_slot(slot_id);
-}
-
-void toggle_led(int led_id, char led_state)
-{
-  if (led_state >= '0' && led_state <= '9')
-  {
-    digitalWrite(led_id, led_state - '0');
-  }
-  else
-  {
-    Serial.println("error closing");
-  }
+  keg_slots[slot_id].scale.tare(times);
 }
