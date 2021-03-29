@@ -9,8 +9,8 @@
         <div class="d1">
             <h2><u>Brew Discription</u></h2>
             <div class="d2">
-                <input matInput readonly="true" class="dates" placeholder="Kegging Date: ">
-                <input matInput readonly="true" class="dates" placeholder="Mashing Date: ">
+                <input matInput readonly="true" class="dates" [ngModel]="getKegDate()">
+                <input matInput readonly="true" class="dates" [ngModel]="getMashDate()">
                 <button mat-raised-button class="edit_button" (click)="EditDialog()">Edit Batch</button>
             </div>
         </div>

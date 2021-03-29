@@ -13,6 +13,7 @@ import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
 import { Keg } from "src/types/Keg";
 import { NewBatchDialog } from "../dialogs/dialogs";
+import { Socks } from "../socks";
 
 @Component({
   selector: "app-slot-selector",
@@ -36,8 +37,9 @@ export class SlotSelectorComponent implements OnInit {
     this.loop_counter = 0;
   }
 
-  select_keg(slot) {
+  select_keg(slot:Keg) {
     this.slots.select(slot);
+    this.socks.ws.send("!w ss:" + slot.slot_id);
   }
 
   NewBatchDialog(id): void {
@@ -72,6 +74,7 @@ export class SlotSelectorComponent implements OnInit {
     private slots: Slots,
     private route: ActivatedRoute,
     private restApi: RestApiService,
+    private socks: Socks,
     public dialog: MatDialog,
     fb: FormBuilder
   ) {

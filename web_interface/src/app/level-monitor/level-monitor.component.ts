@@ -11,6 +11,7 @@ import { Slots } from "../slots";
 import { Keg } from "../../types/Keg";
 import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
+import { Socks } from "../socks";
 
 @Component({
   selector: "app-level-monitor",
@@ -25,9 +26,7 @@ export class LevelMonitorComponent {
 
   get_current_level() {
     var current_level = Number(
-      (
-        Math.round(this.selected_keg.current_level * 100) / 100
-      ).toFixed(2)
+      (Math.round(cur_lvl * 100) / 100).toFixed(2)
     );
     return current_level;
   }
@@ -40,20 +39,44 @@ export class LevelMonitorComponent {
     return relative_level;
   }
 
+  set_current_level() {
+    console.log("HERE");
+  }
+
   constructor(
     private route: ActivatedRoute,
     private slots: Slots,
+    private socks: Socks,
     private fb: FormBuilder
-  ) {this.keg_slots =  slots;}
+  ) {
+    this.keg_slots = slots;
+  }
   ngOnInit() {
     this.slots
       .getSelected()
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((sel) => (this.selected_keg = sel));
+    this.socks.ws.onmessage = function (e) {
+      socket_onmessage_callback(e.data);
+    };
   }
-
+  
   ngOnDestroy() {
     this.unsubscribe$.next(true);
     this.unsubscribe$.complete();
   }
+}
+
+var cur_lvl:number;
+function socket_onmessage_callback(data)
+{
+    if (data.substring(0, 6) == "!t nr:") {
+      var str = data.substring(6);
+      var nm = parseFloat(str).toFixed(3);
+      var htm = "Current Level: " + nm.toString() + "L (remaining)";
+      cur_lvl = parseFloat(nm);
+      document
+        .getElementById("cur_level_lbl")
+        .innerHTML =  htm;
+    }
 }

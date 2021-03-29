@@ -6,7 +6,7 @@
 </ng-container>
 
 <ng-template #temp_norm>
-    <mat-label class="label_norm">Current Level: {{get_current_level()}} L (remaining)</mat-label>
+    <mat-label class="label_norm" id="cur_level_lbl"></mat-label>
     
     <mat-progress-bar [appProgressBarColor]="'green'"
     [value]="get_relative_level()" class="level_indicator">
@@ -22,7 +22,7 @@
 </ng-template>
 
 <ng-template #temp_low class="ind">
-    <mat-label class="label_low">Current Level: {{get_current_level()}} L (remaining)</mat-label>
+    <mat-label class="label_low" id="cur_level_lbl"></mat-label>
 
     <mat-progress-bar [appProgressBarColor]="'red'"
     [value]="get_relative_level()" class="level_indicator">

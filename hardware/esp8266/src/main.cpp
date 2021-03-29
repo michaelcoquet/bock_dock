@@ -32,7 +32,7 @@
 #include <ESPAsyncWiFiManager.h>
 #include <SPIFFSEditor.h>
 
-// #define DEBUG_OUTPUT
+#define DEBUG_OUTPUT
 
 // SKETCH BEGIN
 DNSServer dnsServer;
@@ -62,6 +62,7 @@ void deviceReset();
 
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
 {
+  Serial.println("Getting event");
   if (type == WS_EVT_CONNECT)
   {
 #ifdef DEBUG_OUTPUT
@@ -123,12 +124,12 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
 
       if (msg.substring(0, 6) == "!w nb:")
       {
-        Serial.println("new batch");
         web_msg = msg;
         is_new_batch = true;
       }
       else
       {
+        Serial.println("got something");
         Serial.println(msg);
       }
     }

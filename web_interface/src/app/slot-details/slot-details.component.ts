@@ -30,10 +30,7 @@ export class SlotDetailsComponent implements OnInit {
   animal: string;
   name: string;
 
-  constructor(
-    private slots: Slots,
-    public dialog: MatDialog
-  ) {}
+  constructor(private slots: Slots, public dialog: MatDialog) {}
 
   EditDialog(): void {
     const dialogRef = this.dialog.open(EditBatchDialog, {
@@ -45,6 +42,16 @@ export class SlotDetailsComponent implements OnInit {
       console.log("The dialog was closed");
       this.animal = result;
     });
+  }
+
+  getKegDate(): string 
+  {
+    return "Kegging Date: " + this.selected_keg.kegging_date;
+  }
+
+  getMashDate(): string
+  {
+    return "Mashing Date: " + this.selected_keg.mashing_date;
   }
 
   ngOnInit(): void {
