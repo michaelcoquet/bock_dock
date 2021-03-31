@@ -86,8 +86,8 @@ export class SlotDetailsComponent implements OnInit {
           datasets: [  
             {  
               data: d,  
-              borderColor: '#3cb371',  
-              backgroundColor: "#0000FF",  
+              borderColor: '#301934',  
+              // backgroundColor: "#0000FF",  
             }  
           ]  
         },  

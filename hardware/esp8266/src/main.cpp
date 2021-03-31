@@ -64,6 +64,7 @@ String buildJSON(String batch_id, String slot_id, String reading);
 void reconnect(String batch_id, String slot_id, String reading);
 void callback(char *topic, byte *payload, unsigned int length);
 void setup_wifi();
+void doTm4cHandshake();
 
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org");
@@ -288,6 +289,14 @@ void setup()
   }
 
   espClient.setX509Time(timeClient.getEpochTime());
+
+  doTm4cHandshake();
+
+}
+
+void doTm4cHandshake()
+{
+  return;
 }
 
 void loop()

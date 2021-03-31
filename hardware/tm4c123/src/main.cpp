@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <Energia.h>
+#include <EEPROM.h>
 #include "HX711.h"
 
 #define calibration_factor 9290.0 //This value is obtained using the SparkFun_HX711_Calibration sketch
@@ -100,6 +101,8 @@ unsigned long cur_millis_t2;
 const unsigned long period = 1500;
 const unsigned long upPeriod = 20000;
 
+int active[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
 void setup()
 {
   setupSlots();
@@ -132,7 +135,7 @@ void setupSlots()
     keg_slots[i].CLK = CLK[i];
     keg_slots[i].scale.begin(DOUT[i], CLK[i]);
     keg_slots[i].scale.set_scale(calibration_factor);
-    keg_slots[i].active = false;
+    keg_slots[i].active = active[i];
   }
 }
 
@@ -185,6 +188,47 @@ void decodeUart()
     selected_sid = i - 1;
     keg_slots[selected_sid].selected = true;
     sending = true;
+  }
+  if (uart_buf.substring(0, 8) == "!e stup:")
+  {
+    Serial.println("setting up variables");
+    active[0] = uart_buf.substring(8, 9).toInt();
+    Serial.print(active[0]);
+    if (active[0] = 1)
+      keg_slots[0].active = true;
+    active[1] = uart_buf.substring(9, 10).toInt();
+    Serial.print(active[1]);
+    if (active[1] = 1)
+      keg_slots[1].active = true;
+    active[2] = uart_buf.substring(10, 11).toInt();
+    Serial.print(active[2]);
+    if (active[2] = 1)
+      keg_slots[2].active = true;
+    active[3] = uart_buf.substring(11, 12).toInt();
+    Serial.print(active[3]);
+    if (active[3] = 1)
+      keg_slots[3].active = true;
+    active[4] = uart_buf.substring(12, 13).toInt();
+    Serial.print(active[4]);
+    if (active[4] = 1)
+      keg_slots[4].active = true;
+    active[5] = uart_buf.substring(13, 14).toInt();
+    Serial.print(active[5]);
+    if (active[5] = 1)
+      keg_slots[5].active = true;
+    active[6] = uart_buf.substring(14, 15).toInt();
+    Serial.print(active[6]);
+    if (active[6] = 1)
+      keg_slots[6].active = true;
+    active[7] = uart_buf.substring(15, 16).toInt();
+    Serial.print(active[7]);
+    if (active[7] = 1)
+      keg_slots[7].active = true;
+    uart_buf = "";
+  }
+  if (uart_buf.substring(0, 6) == "!e rdy")
+  {
+    
   }
   uart_buf = "";
 }
