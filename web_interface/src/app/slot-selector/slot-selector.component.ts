@@ -67,7 +67,14 @@ export class SlotSelectorComponent implements OnInit {
         }
       }
     }
-    return;
+    else
+    {
+      for(let i = 0; i < 8; i++)
+      {
+        this.dummy[i] = this.slots.homekeg;
+        this.dummy[i].slot_id = i;
+      }
+    }
   }
 
   constructor(

@@ -99,7 +99,7 @@ export class NewBatchDialog implements OnInit {
     // get the starting level after kegging and put it in current level
     this.data.current_level = parseFloat(document.getElementById("nb_readings").getAttribute("value"));
     // send the stop signal to the tm4c
-    this.socks.ws.send("!w stp");
+    this.socks.ws.send("!w stp:" + this.data.slot_id);
     // upload batch data to dynamodb
     this.restApi.createKeg(this.data);
     this.dialogRef.close();
@@ -119,7 +119,7 @@ export class NewBatchDialog implements OnInit {
     // document.getElementById("overlay").style.display = "block";
     if (!this.nb_started) {
       this.nb_started = true;
-      this.socks.ws.send("!w nb:" + this.data.slot_id);
+      this.socks.ws.send("!w nb:" + this.data.slot_id + " " + this.data.batch_id);
     } else {
       // user wishes to tare the scale again
       console.log("tare the scale again for better reading");

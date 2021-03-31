@@ -10,12 +10,15 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from "@angular/material/dialog";
+import { Chart } from 'chart.js';
+
 
 import { Slots } from "../slots";
 import { Keg } from "../../types/Keg";
 import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
 import { EditBatchDialog } from "../dialogs/dialogs";
+import { RestApiService } from "../rest-api"
 
 @Component({
   selector: "app-slot-details",
@@ -30,7 +33,13 @@ export class SlotDetailsComponent implements OnInit {
   animal: string;
   name: string;
 
-  constructor(private slots: Slots, public dialog: MatDialog) {}
+  reading:any;
+
+  Linechart = [];  
+
+
+  constructor(private slots: Slots, public dialog: MatDialog, public rest: RestApiService) {}
+
 
   EditDialog(): void {
     const dialogRef = this.dialog.open(EditBatchDialog, {
@@ -53,12 +62,50 @@ export class SlotDetailsComponent implements OnInit {
   {
     return "Mashing Date: " + this.selected_keg.mashing_date;
   }
-
+  
   ngOnInit(): void {
     this.slots
       .getSelected()
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((sel) => (this.selected_keg = sel));
+    this.rest.getReadings(this.selected_keg.batch_id).subscribe(read => {
+      this.reading = read;
+      // console.log(this.reading['Items']);
+      let d = [];
+      let l = [];
+      this.reading['Items'].forEach(function (value) {
+        d.push(parseFloat(value['reading']));
+        l.push(value['timestamp']);
+      }); 
+      console.log(d);
+      this.Linechart = new Chart('canvas', {  
+        type: 'line',  
+        data: {  
+          labels: l,  
+
+          datasets: [  
+            {  
+              data: d,  
+              borderColor: '#3cb371',  
+              backgroundColor: "#0000FF",  
+            }  
+          ]  
+        },  
+        options: {  
+          legend: {  
+            display: false  
+          },  
+          scales: {  
+            xAxes: [{  
+              display: true  
+            }],  
+            yAxes: [{  
+              display: true  
+            }],  
+          }  
+        }  
+      });  
+    });
   }
   ngOnDestroy() {
     this.unsubscribe$.next(true);
