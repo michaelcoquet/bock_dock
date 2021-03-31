@@ -1,4 +1,3 @@
-#include <ArduinoOTA.h>
 #ifdef ESP32
 #include <FS.h>
 #ifdef USE_LittleFS
@@ -25,26 +24,28 @@
 #define MYFS SPIFFS
 #endif
 #include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
 #include <ESPAsyncTCP.h>
 #include <ESP8266mDNS.h>
 #endif
 #include <ESPAsyncWebServer.h>
 #include <ESPAsyncWiFiManager.h>
-#include <SPIFFSEditor.h>
+#include <WiFiClientSecure.h>
+#include <ESP8266WiFi.h>
+#include <PubSubClient.h>
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+#include <ArduinoJson.h>
 
-#define DEBUG_OUTPUT
+// #define DEBUG_OUTPUT
 
 // SKETCH BEGIN
 DNSServer dnsServer;
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 AsyncEventSource events("/events");
-AsyncWiFiManager wifiManager(&server, &dnsServer);
+// AsyncWiFiManager wifiManager(&server, &dnsServer);
 char deviceName[40];
-
-const char *hostName = "esp-async";
-const char *http_username = "admin";
-const char *http_password = "admin";
 
 String uart_buf;
 AsyncWebSocketClient *client_buf;
@@ -59,10 +60,39 @@ void uartHandler();
 void newBatchHandler();
 void decodeUart();
 void deviceReset();
+String buildJSON(String batch_id, String slot_id, String reading);
+void reconnect(String batch_id, String slot_id, String reading);
+void callback(char *topic, byte *payload, unsigned int length);
+void setup_wifi();
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org");
+
+const char *AWS_endpoint = "a1g4safb7la8p-ats.iot.us-east-1.amazonaws.com"; //MQTT broker ip
+
+WiFiClientSecure espClient;
+PubSubClient client(AWS_endpoint, 8883, callback, espClient); //set  MQTT port number to 8883 as per //standard
+long lastMsg = 0;
+char msg[50];
+int value = 0;
+
+const char* ssid = "dlink_C";
+const char* password = "7D3705181B";
+
+void callback(char *topic, byte *payload, unsigned int length)
+{
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i = 0; i < length; i++)
+  {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
 
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
 {
-  Serial.println("Getting event");
   if (type == WS_EVT_CONNECT)
   {
 #ifdef DEBUG_OUTPUT
@@ -129,9 +159,101 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
       }
       else
       {
-        Serial.println("got something");
         Serial.println(msg);
       }
+    }
+  }
+}
+
+void setupCerts()
+{
+  if (!SPIFFS.begin())
+  {
+    Serial.println("Failed to mount file system");
+    return;
+  }
+
+  Serial.print("Heap: ");
+  Serial.println(ESP.getFreeHeap());
+
+  // Load certificate file
+  File cert = SPIFFS.open("/cert.der", "r"); //replace cert.crt eith your uploaded file name
+  if (!cert)
+  {
+    Serial.println("Failed to open cert file");
+  }
+  else
+    Serial.println("Success to open cert file");
+
+  delay(1000);
+
+  if (espClient.loadCertificate(cert))
+    Serial.println("cert loaded");
+  else
+    Serial.println("cert not loaded");
+
+  // Load private key file
+  File private_key = SPIFFS.open("/private.der", "r"); //replace private eith your uploaded file name
+  if (!private_key)
+  {
+    Serial.println("Failed to open private cert file");
+  }
+  else
+    Serial.println("Success to open private cert file");
+
+  delay(1000);
+
+  if (espClient.loadPrivateKey(private_key))
+    Serial.println("private key loaded");
+  else
+    Serial.println("private key not loaded");
+
+  // Load CA file
+  File ca = SPIFFS.open("/ca.der", "r"); //replace ca eith your uploaded file name
+  if (!ca)
+  {
+    Serial.println("Failed to open ca ");
+  }
+  else
+    Serial.println("Success to open ca");
+
+  delay(1000);
+
+  if (espClient.loadCACert(ca))
+    Serial.println("ca loaded");
+  else
+    Serial.println("ca failed");
+}
+
+void reconnect(String batch_id, String slot_id, String reading)
+{
+  // Loop until we're reconnected
+  if (!client.connected())
+  {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect("ESPthing"))
+    {
+      Serial.println("connected");
+      // Once connected, publish an announcement...
+      Serial.print("publishing reading: ");
+      Serial.println(buildJSON(batch_id, slot_id, reading));
+      client.publish("outTopic", buildJSON(batch_id, slot_id, reading).c_str());
+      // ... and resubscribe
+      client.subscribe("inTopic");
+    }
+    else
+    {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+
+      char buf[256];
+      espClient.getLastSSLError(buf, 256);
+      Serial.print("WiFiClientSecure SSL error: ");
+      Serial.println(buf);
+
+      // Wait 5 seconds before retrying
     }
   }
 }
@@ -140,51 +262,8 @@ void setup()
 {
   delay(100);
   Serial.begin(115200);
-  // id/name, placeholder/prompt, default, length
-  AsyncWiFiManagerParameter custom_devicename("DeviceName", "Device Name", deviceName, 40);
-  wifiManager.addParameter(&custom_devicename);
-  wifiManager.setTimeout(180);
-#ifdef DEBUG_OUTPUT
-  wifiManager.setDebugOutput(true);
-#else
-  wifiManager.setDebugOutput(false);
-#endif
-
-  if (!wifiManager.autoConnect("Kegerator Connect"))
-  {
-    Serial.println("failed to connect and hit timeout");
-    deviceReset();
-  }
-#ifdef DEBUG_OUTPUT
-  Serial.println("Wifi Connection Successful");
-  Serial.print(F("*CONNECTED* IP:"));
-  Serial.println(WiFi.localIP());
-#endif
-
-  //Send OTA events to the browser
-  ArduinoOTA.onStart([]() { events.send("Update Start", "ota"); });
-  ArduinoOTA.onEnd([]() { events.send("Update End", "ota"); });
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    char p[32];
-    sprintf(p, "Progress: %u%%\n", (progress / (total / 100)));
-    events.send(p, "ota");
-  });
-  ArduinoOTA.onError([](ota_error_t error) {
-    if (error == OTA_AUTH_ERROR)
-      events.send("Auth Failed", "ota");
-    else if (error == OTA_BEGIN_ERROR)
-      events.send("Begin Failed", "ota");
-    else if (error == OTA_CONNECT_ERROR)
-      events.send("Connect Failed", "ota");
-    else if (error == OTA_RECEIVE_ERROR)
-      events.send("Recieve Failed", "ota");
-    else if (error == OTA_END_ERROR)
-      events.send("End Failed", "ota");
-  });
-  ArduinoOTA.setHostname(hostName);
-  ArduinoOTA.begin();
-
-  //start the web server
+  setupCerts();
+  setup_wifi();
 
   MDNS.addService("http", "tcp", 80);
 
@@ -200,21 +279,19 @@ void setup()
 
   server.addHandler(&events);
 
-  server.addHandler(
-      new SPIFFSEditor(http_username, http_password, MYFS));
-
-  server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "text/plain", String(ESP.getFreeHeap()));
-  });
-
-  server.serveStatic("/", MYFS, "/").setDefaultFile("index.html");
-
   server.begin();
+
+  timeClient.begin();
+  while (!timeClient.update())
+  {
+    timeClient.forceUpdate();
+  }
+
+  espClient.setX509Time(timeClient.getEpochTime());
 }
 
 void loop()
 {
-  ArduinoOTA.handle();
   ws.cleanupClients();
   uartHandler();
   newBatchHandler();
@@ -241,24 +318,6 @@ void newBatchHandler()
     {
       Serial.println("tare ack received");
       nb_readings = true;
-    }
-    if (tare_ack && nb_readings)
-    {
-      // if (Serial.available() > 0)
-      // {
-      //   char recv = Serial.read();
-      //   uart_buf += recv;
-      //   if (recv == '\n')
-      //   {
-      //     if (uart_buf.substring(0, 6) == "!t nr:")
-      //     {
-      //       Serial.write("reading: ");
-      //       Serial.write(uart_buf.c_str());
-      //       client_buf->printf(uart_buf.c_str());
-      //     }
-      //     uart_buf = "";
-      //   }
-      // }
     }
     if (nb_stop)
     {
@@ -298,6 +357,80 @@ void decodeUart()
     Serial.write(uart_buf.c_str());
     client_buf->printf(uart_buf.c_str());
   }
+  if (uart_buf.substring(0, 6) == "!t up:")
+  {
+
+    // Serial.print("slot_id: " + uart_buf.substring(6,7));
+    // if(uart_buf.substring(8,9) == "-")
+    // {
+    //   Serial.print(" Reading(-): " + uart_buf.substring(8,15));
+    //   Serial.print(" Batch_id: " + uart_buf.substring(16));
+    // }
+    // else
+    // {
+    //   Serial.print(" Reading(+): " + uart_buf.substring(8,14));
+    //   Serial.println(" Batch_id: " + uart_buf.substring(15));
+    // }
+    // Serial.print("\n");
+    String sid = uart_buf.substring(6, 7);
+    String bid;
+    String rdng;
+    bid = uart_buf.substring(8, 44);
+    rdng = uart_buf.substring(45);
+    // if (uart_buf.substring(8, 9) == "-")
+    // {
+    //   rdng = uart_buf.substring(8, 15);
+      
+    // }
+    // else
+    // {
+    //   rdng = uart_buf.substring(8, 14);
+    //   bid = uart_buf.substring(15, 51);
+    // }
+
+    if (!client.connected())
+    {
+      reconnect(bid, sid, rdng);
+    }
+    client.loop();
+  }
+}
+
+
+void setup_wifi() {
+
+  delay(10);
+  // We start by connecting to a WiFi network
+  espClient.setBufferSizes(512, 512);
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  timeClient.begin();
+  while(!timeClient.update()){
+    timeClient.forceUpdate();
+  }
+
+  espClient.setX509Time(timeClient.getEpochTime());
+
+}
+
+String buildJSON(String batch_id, String slot_id, String reading)
+{
+  reading.trim();
+  return "{\"batch_id\":\"" + batch_id + "\",\"slot_id\":\"" + slot_id + "\",\"reading\":\"" + reading + "\"}";
 }
 
 void deviceReset()

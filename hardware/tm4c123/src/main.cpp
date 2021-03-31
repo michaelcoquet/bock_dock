@@ -72,12 +72,14 @@ void tareSlot(int slot_id, int times);
 void setupSlots();
 void uartHandler();
 void sendCurrentLevel();
-void char_reading(char *chr, int slot_id, int times);
+float reading(int slot_id, int times);
 float lbsToL(float lbs);
+void scheduledUploads();
 
 typedef struct Slots
 {
-  char batch_id[36];
+  bool active;
+  String batch_id;
   bool selected;
   double current_level;
   HX711 scale;
@@ -96,6 +98,7 @@ unsigned long start_millis_t2;
 unsigned long cur_millis_t1;
 unsigned long cur_millis_t2;
 const unsigned long period = 1500;
+const unsigned long upPeriod = 20000;
 
 void setup()
 {
@@ -115,10 +118,9 @@ void setup()
 
 void loop()
 {
-  cur_millis_t1 = millis();
-  cur_millis_t2 = millis();
-  uartHandler();
   sendCurrentLevel();
+  scheduledUploads();
+  uartHandler();
 }
 
 void setupSlots()
@@ -130,21 +132,22 @@ void setupSlots()
     keg_slots[i].CLK = CLK[i];
     keg_slots[i].scale.begin(DOUT[i], CLK[i]);
     keg_slots[i].scale.set_scale(calibration_factor);
+    keg_slots[i].active = false;
   }
 }
 
 // t1
 void uartHandler()
 {
-    if (Serial2.available() > 0)
+  if (Serial2.available() > 0)
+  {
+    char recv = Serial2.read();
+    uart_buf += recv;
+    if (recv == '\n')
     {
-      char recv = Serial2.read();
-      uart_buf += recv;
-      if (recv == '\n')
-      {
-        decodeUart();
-      }
+      decodeUart();
     }
+  }
 }
 
 void decodeUart()
@@ -165,10 +168,12 @@ void decodeUart()
     int i = uart_buf.substring(6, 7).toInt();
     tareSlot(i - 1, 20);
   }
-  if (uart_buf.substring(0, 6) == "!w stp")
+  if (uart_buf.substring(0, 7) == "!w stp:")
   {
     // user is finished with new batch wizard stop sending
     // readings
+    int i = uart_buf.substring(7, 8).toInt();
+    keg_slots[i - 1].active = true;
     nb_sending = false;
     sending = false;
   }
@@ -189,14 +194,13 @@ void startSlot(char slot_id)
   int i = (int)slot_id;
   i = i - '0';
   i--;
+  keg_slots[i].batch_id = uart_buf.substring(8);
   Serial.write("slot id: ");
   Serial.write(slot_id);
   Serial.write("\n");
   tareSlot(i, 10);
   Serial.write("Reading: ");
-  char chr_rdng[5];
-  char_reading(chr_rdng, i, 20);
-  Serial.write(chr_rdng);
+  Serial.print(reading(i, 20), 4);
   Serial.write("\n");
   Serial.write("Success: sending ack back\n");
   Serial2.write("!t nb:");
@@ -210,16 +214,49 @@ void startSlot(char slot_id)
   nb_sending = true;
 }
 
-void char_reading(char *chr, int slot_id, int times)
+float reading(int slot_id, int times)
 {
   float reading = keg_slots[slot_id].scale.get_units(times);
   float reading_vol = lbsToL(reading);
-  gcvt(reading_vol, 6, chr);
+  return reading_vol;
+}
+
+void scheduledUploads()
+{
+  cur_millis_t1 = millis();
+  if (cur_millis_t1 - start_millis_t1 >= upPeriod)
+  {
+    for (int i = 0; i < 8; i++)
+    {
+      if (keg_slots[i].active == true)
+      {
+        float rd = reading(i, 10);
+        keg_slots[i].batch_id.trim();
+        Serial.write("!t up:");
+        String tmp = String(i + 1);
+        Serial.write(tmp.c_str());
+        Serial.write(" ");
+        Serial.write(keg_slots[i].batch_id.c_str());
+        Serial.write(" ");
+        Serial.print(rd, 4);
+        Serial.write("\n");
+        Serial2.write("!t up:");
+        Serial2.write(tmp.c_str());
+        Serial2.write(" ");
+        Serial2.write(keg_slots[i].batch_id.c_str());
+        Serial2.write(" ");
+        Serial2.print(rd, 4);
+        Serial2.write("\n");
+      }
+    }
+    start_millis_t1 = cur_millis_t1;
+  }
 }
 
 // t2
 void sendCurrentLevel()
 {
+  cur_millis_t2 = millis();
   if (cur_millis_t2 - start_millis_t2 >= period)
   {
     if (nb_sending || sending)
@@ -228,13 +265,12 @@ void sendCurrentLevel()
       {
         if (keg_slots[i].selected)
         {
-          char r[6];
-          char_reading(r, i, 10);
+          float r = reading(i, 10);
           Serial.write("sending reading: ");
-          Serial.write(r);
+          Serial.print(r, 4);
           Serial.write("\n");
           Serial2.write("!t nr:");
-          Serial2.write(r);
+          Serial2.print(r, 4);
           Serial2.write("\n");
         }
       }
